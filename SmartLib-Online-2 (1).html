@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="theme-color" content="#050c1a"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>📚 SmartLib — Seat Booking Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --bg:#050c1a;--bg2:#0a1628;--bg3:#0f1e38;--bg4:#162847;
+  --border:#1a2e4a;--border2:#1f3659;
+  --text:#e8f0ff;--muted:#4a6589;--muted2:#6b85a8;
+  --blue:#3b82f6;--blue2:#1d4ed8;--blue3:#60a5fa;
+  --green:#10b981;--green2:#065f46;--green3:#34d399;
+  --amber:#f59e0b;--amber2:#92400e;
+  --red:#ef4444;--red2:#7f1d1d;
+  --purple:#8b5cf6;--cyan:#06b6d4;--pink:#ec4899;
+  --r:12px;--r2:8px;--shadow:0 8px 40px rgba(0,0,0,.6);
+  --glow-blue:0 0 20px rgba(59,130,246,.25);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px}
+
+/* INPUTS */
+.inp{width:100%;padding:11px 14px;border-radius:var(--r2);border:1.5px solid var(--border2);background:var(--bg2);color:var(--text);font-size:14px;font-family:'Plus Jakarta Sans',sans-serif;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none}
+.inp:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+.inp::placeholder{color:var(--muted)}
+select.inp option{background:var(--bg3)}
+textarea.inp{resize:vertical;min-height:80px}
+
+/* SCREEN */
+.screen{display:none;animation:screenIn .22s ease}
+.screen.active{display:block}
+@keyframes screenIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* HEADER */
+.header{background:linear-gradient(135deg,#081230 0%,#0c0e3a 100%);padding:13px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;border-bottom:1px solid rgba(59,130,246,.12);box-shadow:0 2px 20px rgba(0,0,0,.6)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--blue2),var(--purple));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;box-shadow:0 4px 12px rgba(59,130,246,.3)}
+.logo-name{font-size:15px;font-weight:800;letter-spacing:.3px}
+.logo-sub{font-size:9px;color:rgba(255,255,255,.35);letter-spacing:.5px;text-transform:uppercase}
+.header-right{display:flex;align-items:center;gap:8px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;border-radius:var(--r2);padding:10px 16px;font-weight:700;font-size:13px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .18s;white-space:nowrap;-webkit-appearance:none}
+.btn-primary{background:linear-gradient(135deg,var(--blue2),var(--blue));color:#fff;box-shadow:0 4px 14px rgba(59,130,246,.3)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(59,130,246,.4)}
+.btn-primary:active{transform:translateY(0);box-shadow:none}
+.btn-green{background:linear-gradient(135deg,var(--green2),var(--green));color:#fff;box-shadow:0 4px 12px rgba(16,185,129,.25)}
+.btn-green:hover{transform:translateY(-1px)}
+.btn-amber{background:linear-gradient(135deg,var(--amber2),var(--amber));color:#111;box-shadow:0 4px 12px rgba(245,158,11,.25)}
+.btn-amber:hover{transform:translateY(-1px)}
+.btn-ghost{background:var(--bg3);color:var(--muted2);border:1px solid var(--border2)}
+.btn-ghost:hover{color:var(--text);background:var(--bg4)}
+.btn-red{background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.2)}
+.btn-red:hover{background:rgba(239,68,68,.22)}
+.btn-purple{background:linear-gradient(135deg,#4c1d95,var(--purple));color:#fff}
+.btn-sm{padding:7px 12px;font-size:12px}
+.btn-full{width:100%}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+
+/* CONTENT */
+.content{padding:18px;max-width:840px;margin:0 auto}
+
+/* ━━ LANDING ━━ */
+.landing-hero{text-align:center;padding:44px 20px 24px}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);color:var(--blue3);border-radius:50px;padding:5px 14px;font-size:11px;font-weight:700;margin-bottom:18px;letter-spacing:.5px;text-transform:uppercase}
+.hero-title{font-size:clamp(26px,6vw,46px);font-weight:800;line-height:1.1;margin-bottom:10px;letter-spacing:-.5px}
+.hero-title span{background:linear-gradient(135deg,var(--blue3),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{color:var(--muted2);font-size:14px;max-width:440px;margin:0 auto 28px;line-height:1.7}
+.hero-stats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:32px}
+.hero-stat{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px 20px;text-align:center;min-width:100px}
+.hero-stat-val{font-size:22px;font-weight:800;font-family:'Space Mono',monospace}
+.hero-stat-lbl{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+.landing-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:0;text-align:left}
+.land-card{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:22px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden}
+.land-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--accent,#3b82f6) 0%,transparent 60%);opacity:.04;pointer-events:none;transition:opacity .2s}
+.land-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.45);border-color:var(--accent,#3b82f6)}
+.land-card:hover::after{opacity:.08}
+.land-card-icon{font-size:30px;margin-bottom:10px}
+.land-card-title{font-weight:800;font-size:16px;margin-bottom:5px}
+.land-card-desc{font-size:12px;color:var(--muted2);line-height:1.65}
+
+/* ━━ STEPS PROGRESS ━━ */
+.step-nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 18px 10px}
+.step-track{display:flex;align-items:center;gap:0;margin-bottom:8px}
+.step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;transition:all .3s;font-family:'Space Mono',monospace}
+.step-dot.done{background:var(--green);color:#fff;box-shadow:0 0 0 3px rgba(16,185,129,.2)}
+.step-dot.active{background:var(--blue);color:#fff;box-shadow:0 0 0 4px rgba(59,130,246,.2)}
+.step-dot.pending{background:var(--bg4);color:var(--muted);border:1.5px solid var(--border2)}
+.step-line{flex:1;height:2px;background:var(--border2);margin:0 4px;border-radius:2px;transition:background .3s}
+.step-line.done{background:var(--green)}
+.step-labels{display:flex;justify-content:space-between;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+
+/* ━━ OTP ━━ */
+.otp-wrap{max-width:380px;margin:0 auto;padding:24px 18px}
+.otp-title{font-size:20px;font-weight:800;margin-bottom:6px;text-align:center}
+.otp-sub{font-size:13px;color:var(--muted2);text-align:center;margin-bottom:22px;line-height:1.65}
+.otp-inputs{display:flex;gap:8px;justify-content:center;margin:14px 0}
+.otp-inp{width:46px;height:54px;text-align:center;font-size:22px;font-weight:800;border-radius:10px;border:2px solid var(--border2);background:var(--bg2);color:var(--text);font-family:'Space Mono',monospace;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.otp-inp:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+.phone-display{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:8px;padding:10px 14px;font-size:14px;font-weight:700;color:var(--blue3);margin-bottom:14px;text-align:center;font-family:'Space Mono',monospace}
+.demo-otp-box{background:rgba(6,182,212,.07);border:1px solid rgba(6,182,212,.18);border-radius:8px;padding:12px;text-align:center;margin:0 0 14px}
+
+/* ━━ FORM ━━ */
+.field{margin-bottom:13px}
+.field label{display:block;font-size:11px;color:var(--muted2);font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-bottom:5px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:400px){.field-row{grid-template-columns:1fr}}
+
+/* ━━ PHOTO UPLOAD — FIXED ━━ */
+.photo-upload-wrap{cursor:pointer}
+.photo-upload-box{border:2px dashed var(--border2);border-radius:var(--r2);padding:14px;text-align:center;transition:all .2s;background:var(--bg2);position:relative;min-height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.photo-upload-box:hover{border-color:var(--blue);background:rgba(59,130,246,.04)}
+.photo-upload-box.has-photo{border-color:var(--green);border-style:solid;background:rgba(16,185,129,.04)}
+.photo-preview-img{width:72px;height:72px;border-radius:8px;object-fit:cover;display:block}
+.photo-upload-icon{font-size:24px;opacity:.7}
+.photo-upload-text{font-size:11px;color:var(--muted2);line-height:1.5}
+.photo-upload-hint{font-size:10px;color:var(--amber);font-weight:600}
+.photo-success-name{font-size:11px;color:var(--green3);font-weight:700;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ━━ SEAT MAP ━━ */
+.seat-section{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.seat-section-title{font-weight:700;font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted2);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.seat-legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;font-size:11px;font-weight:600;padding:10px 12px;background:var(--bg2);border-radius:var(--r2);border:1px solid var(--border)}
+.legend-item{display:flex;align-items:center;gap:5px}
+.legend-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.seat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(50px,1fr));gap:6px}
+.seat-btn{background:var(--bg2);border:1.5px solid var(--border2);border-radius:7px;padding:7px 3px;text-align:center;cursor:pointer;transition:all .15s;position:relative;user-select:none;-webkit-user-select:none}
+.seat-btn:hover:not(.occupied):not(.selected){border-color:var(--blue);background:rgba(59,130,246,.08);transform:scale(1.04)}
+.seat-btn.available{border-color:#064e3b;background:rgba(16,185,129,.06)}
+.seat-btn.available:hover{background:rgba(16,185,129,.14);border-color:var(--green)}
+.seat-btn.occupied{border-color:var(--border);background:var(--bg);cursor:not-allowed;opacity:.45}
+.seat-btn.selected{border-color:var(--blue);background:rgba(59,130,246,.16);box-shadow:0 0 0 2px rgba(59,130,246,.25);transform:scale(1.04)}
+.seat-btn.mine{border-color:var(--amber);background:rgba(245,158,11,.1);cursor:default}
+.seat-btn.partial-avail{border-color:#4c1d95;background:rgba(139,92,246,.07)}
+.seat-num{font-size:13px;font-weight:800;font-family:'Space Mono',monospace}
+.seat-lbl{font-size:7.5px;margin-top:2px;font-weight:700;letter-spacing:.2px;opacity:.65;text-transform:uppercase}
+
+/* ━━ TIMING PANEL ━━ */
+.timing-panel{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:14px;margin-top:12px;animation:screenIn .18s ease}
+.timing-row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:8px;border:1.5px solid var(--border2);margin-bottom:6px;cursor:pointer;transition:all .18s;background:var(--bg3)}
+.timing-row:hover:not(.t-taken){border-color:var(--blue);background:rgba(59,130,246,.07)}
+.timing-row.t-selected{border-color:var(--blue);background:rgba(59,130,246,.13);box-shadow:0 0 0 2px rgba(59,130,246,.12)}
+.timing-row.t-taken{opacity:.35;cursor:not-allowed}
+.t-label{font-size:13px;font-weight:600}
+.t-price{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--green3)}
+.t-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
+.t-avail{background:rgba(16,185,129,.1);color:var(--green3)}
+.t-taken-lbl{background:rgba(100,100,100,.1);color:var(--muted)}
+
+/* ━━ PAYMENT ━━ */
+.payment-wrap{max-width:460px;margin:0 auto}
+.pay-summary{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.pay-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:7px 0;border-bottom:1px solid var(--border)}
+.pay-row:last-child{border:none;font-weight:800;font-size:15px;color:var(--green3);padding-top:10px;margin-top:4px}
+.pay-methods{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.pay-method{border:2px solid var(--border2);border-radius:var(--r2);padding:16px 12px;text-align:center;cursor:pointer;transition:all .18s;background:var(--bg3)}
+.pay-method:hover{border-color:var(--blue)}
+.pay-method.selected{border-color:var(--blue);background:rgba(59,130,246,.08);box-shadow:0 0 0 2px rgba(59,130,246,.1)}
+.pay-icon{font-size:26px;margin-bottom:6px}
+.pay-name{font-size:12px;font-weight:700}
+.qr-container{background:#fff;border-radius:12px;padding:16px;text-align:center;margin:10px 0}
+.qr-container #qrcode{display:inline-block;margin:0 auto 8px}
+.qr-upi{font-size:13px;color:#111;font-weight:700;margin-top:4px}
+.qr-name{font-size:11px;color:#444;margin-top:2px}
+
+/* ━━ MY SEAT CARD ━━ */
+.my-seat-card{background:linear-gradient(135deg,#0a1e5e 0%,#100c48 100%);border:1px solid rgba(59,130,246,.2);border-radius:var(--r);padding:20px;margin-bottom:14px;position:relative;overflow:hidden}
+.my-seat-card::before{content:'📚';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:52px;opacity:.06}
+.my-seat-num{font-size:38px;font-weight:800;font-family:'Space Mono',monospace;color:var(--blue3);line-height:1}
+.my-seat-sub{color:var(--muted2);font-size:13px;margin-top:4px}
+.days-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:50px;font-weight:800;font-size:12px;margin-top:8px}
+
+/* ━━ SUCCESS ━━ */
+.success-wrap{text-align:center;padding:28px 18px}
+.success-icon{font-size:60px;margin-bottom:14px;animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(.4)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+.success-title{font-size:22px;font-weight:800;margin-bottom:6px;color:var(--green3)}
+.success-sub{color:var(--muted2);font-size:13px;line-height:1.7}
+.receipt{background:var(--bg2);border:1px dashed var(--border2);border-radius:var(--r);padding:14px;margin:18px 0;text-align:left}
+.receipt-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 0;border-bottom:1px solid var(--border)}
+.receipt-row:last-child{border:none;font-weight:800;color:var(--green3);margin-top:4px;font-size:14px}
+
+/* ━━ MODAL ━━ */
+.overlay{position:fixed;inset:0;background:rgba(2,6,16,.9);backdrop-filter:blur(10px);display:flex;align-items:flex-end;justify-content:center;z-index:400;animation:fadeIn .18s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@media(min-width:540px){.overlay{align-items:center;padding:16px}}
+.modal{background:var(--bg3);border-radius:18px 18px 0 0;padding:20px 20px 30px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;border:1px solid var(--border2);border-bottom:none;animation:slideUp .22s ease}
+@media(min-width:540px){.modal{border-radius:18px;border-bottom:1px solid var(--border2)}}
+@keyframes slideUp{from{transform:translateY(30px);opacity:.4}to{transform:none;opacity:1}}
+.drag{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px}
+@media(min-width:540px){.drag{display:none}}
+.modal-head{font-size:16px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.modal-acts{display:flex;gap:8px;margin-top:6px}
+
+/* ━━ TOAST ━━ */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);padding:11px 22px;border-radius:50px;font-weight:700;font-size:13px;z-index:999;white-space:nowrap;max-width:90vw;text-align:center;animation:toastIn .25s ease;pointer-events:none;font-family:'Plus Jakarta Sans',sans-serif}
+@keyframes toastIn{from{transform:translateX(-50%) translateY(14px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+.toast.ok{background:var(--green);color:#fff;box-shadow:0 6px 20px rgba(16,185,129,.35)}
+.toast.err{background:var(--red);color:#fff;box-shadow:0 6px 20px rgba(239,68,68,.35)}
+.toast.info{background:var(--blue);color:#fff;box-shadow:0 6px 20px rgba(59,130,246,.35)}
+
+/* ━━ NAV ━━ */
+.top-nav{display:flex;gap:2px;padding:10px 16px 0;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto}
+.top-nav::-webkit-scrollbar{display:none}
+.nav-btn{padding:8px 16px;border:none;border-radius:8px 8px 0 0;font-weight:600;font-size:13px;white-space:nowrap;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .18s;position:relative}
+.nav-btn.active{background:var(--bg);color:var(--blue3)}
+.nav-btn.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--blue);border-radius:2px 2px 0 0}
+.nav-btn:not(.active){background:transparent;color:var(--muted)}
+.nav-btn:not(.active):hover{color:var(--text);background:rgba(255,255,255,.04)}
+
+/* ━━ STAT CARDS ━━ */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:16px}
+.stat{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px;position:relative;overflow:hidden}
+.stat::after{content:'';position:absolute;top:-18px;right:-18px;width:56px;height:56px;border-radius:50%;background:var(--accent,var(--blue));opacity:.07}
+.stat-val{font-size:24px;font-weight:800;color:var(--accent,var(--blue));font-family:'Space Mono',monospace}
+.stat-label{font-size:10px;color:var(--muted);margin-top:4px;font-weight:600;letter-spacing:.4px;text-transform:uppercase}
+
+/* ━━ MEMBER CARD ━━ */
+.member-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:13px 15px;margin-bottom:8px;border-left:3px solid var(--seat-color,var(--blue));transition:all .18s}
+.member-card:hover{box-shadow:var(--shadow);border-color:rgba(59,130,246,.25)}
+.mc-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:7px}
+.seat-badge{border-radius:6px;padding:3px 9px;font-weight:800;font-size:12px;color:#111;font-family:'Space Mono',monospace}
+.name-txt{font-weight:700;font-size:14px}
+.pill{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.2px}
+.pill-active{background:rgba(16,185,129,.1);color:var(--green3)}
+.pill-warn{background:rgba(245,158,11,.1);color:var(--amber)}
+.pill-crit{background:rgba(239,68,68,.1);color:var(--red)}
+.pill-exp{background:rgba(100,116,139,.1);color:var(--muted)}
+.mc-meta{font-size:12px;color:var(--muted2);display:flex;flex-wrap:wrap;gap:10px}
+.mc-acts{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+
+/* ━━ SEARCH ━━ */
+.search-row{display:flex;gap:8px;margin-bottom:12px}
+.search-wrap{flex:1;position:relative}
+.search-wrap .inp{padding-left:34px}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none}
+
+/* ━━ SECTION BOX ━━ */
+.section-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.sec-title{font-weight:700;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted2);margin-bottom:12px}
+
+/* ━━ MISC ━━ */
+.divider{height:1px;background:var(--border);margin:14px 0}
+.empty{text-align:center;padding:44px 20px;color:var(--muted)}
+.empty-icon{font-size:42px;opacity:.3;margin-bottom:10px}
+.info-box{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.14);border-radius:var(--r2);padding:11px 13px;font-size:12px;color:rgba(147,197,253,.85);margin-bottom:12px;line-height:1.6}
+.warn-box{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.18);border-radius:var(--r2);padding:11px 13px;font-size:12px;color:rgba(253,230,138,.9);margin-bottom:12px;line-height:1.6}
+.page-title{font-size:20px;font-weight:800;margin-bottom:3px;letter-spacing:-.3px}
+.page-sub{font-size:12px;color:var(--muted2);margin-bottom:16px}
+.admin-label{display:inline-flex;align-items:center;gap:4px;background:rgba(239,68,68,.1);color:#fca5a5;border:1px solid rgba(239,68,68,.18);border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700}
+.doc-thumb{width:56px;height:40px;border-radius:6px;object-fit:cover;border:1.5px solid var(--border2);cursor:pointer}
+.member-photo{width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--blue);flex-shrink:0}
+
+/* ━━ RENEWAL ALERT ━━ */
+.renew-alert{background:linear-gradient(90deg,rgba(245,158,11,.12),rgba(245,158,11,.04));border-bottom:1px solid rgba(245,158,11,.18);padding:9px 18px;font-size:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.renew-alert .badge{background:rgba(245,158,11,.18);color:var(--amber);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700}
+
+/* ━━ BOTTOM NAV (mobile) ━━ */
+.bnav{display:none}
+@media(max-width:600px){
+  .top-nav{display:none}
+  .content{padding-bottom:72px}
+  .toast{bottom:66px}
+  .bnav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--bg3);border-top:1px solid var(--border);z-index:100;padding-bottom:env(safe-area-inset-bottom,0)}
+  .bnav-btn{flex:1;padding:10px 4px 8px;border:none;background:transparent;color:var(--muted);font-size:9px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:color .15s;position:relative}
+  .bnav-btn.active{color:var(--blue3)}
+  .bnav-btn.active::before{content:'';position:absolute;top:0;left:22%;right:22%;height:2px;background:var(--blue);border-radius:0 0 2px 2px}
+  .bnav-icon{font-size:18px}
+}
+
+/* ━━ SELECTION SUMMARY BAR ━━ */
+.seat-confirm-bar{background:var(--bg3);border:1.5px solid rgba(59,130,246,.25);border-radius:var(--r);padding:13px 15px;margin-top:14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.seat-confirm-info{flex:1}
+.seat-confirm-title{font-weight:800;font-size:14px}
+.seat-confirm-sub{color:var(--muted2);font-size:12px;margin-top:2px}
+.seat-confirm-price{font-size:19px;font-weight:800;color:var(--green3);font-family:'Space Mono',monospace;white-space:nowrap}
+
+/* ━━ PRINT ━━ */
+@media print{body{background:#fff!important;color:#000!important}.no-print,.header,.bnav,.top-nav,.btn,.overlay{display:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ══════════════════════════════════════════════
+// CONFIG — apne hisaab se badlo
+// ══════════════════════════════════════════════
+const SK = "smartlib_v3";
+const ADMIN_PASS = "admin123";
+const UPI_ID = "7223907773@pnb";
+const UPI_NAME = "SAMLOO RAM KARMA";
+
+// Seat 26 aur 48 completely hidden — dono sides se (student + admin)
+const HIDDEN_SEATS = [26, 48];
+
+const T4 = ["6:15 AM – 10:15 AM","10:15 AM – 2:15 PM","2:15 PM – 6:15 PM","6:15 PM – 10:15 PM"];
+const T6 = ["6:15 AM – 10:15 AM","10:15 AM – 4:15 PM","4:15 PM – 10:15 PM"];
+
+function catOf(n){n=+n;if(n>=1&&n<=20)return"4hr";if(n>=21&&n<=25)return"6hr";if(n>=27&&n<=47||n>=49&&n<=100)return"res";return null}
+function timingsOf(n){let c=catOf(n);return c==="4hr"?T4:c==="6hr"?T6:[]}
+function feeOf(n,t){
+  if(HIDDEN_SEATS.includes(+n))return 0;
+  let c=catOf(n);
+  if(c==="4hr")return 400;
+  if(c==="6hr")return t==="6:15 AM – 10:15 AM"?400:600;
+  if(c==="res")return 900;
+  return 0;
+}
+function labelOf(n,t){
+  let c=catOf(n);
+  if(c==="4hr")return"4 Ghante Slot";
+  if(c==="6hr")return t==="6:15 AM – 10:15 AM"?"4 Ghante Slot":"6 Ghante Slot";
+  if(c==="res")return"Reserved Seat (Full Day)";
+  return"";
+}
+function colorOf(n){let c=catOf(n);return c==="4hr"?"#f59e0b":c==="6hr"?"#a78bfa":c==="res"?"#34d399":"#64748b"}
+function todayStr(){return new Date().toISOString().split("T")[0]}
+function addMonth(ds){let d=new Date(ds||todayStr());d.setMonth(d.getMonth()+1);return d.toISOString().split("T")[0]}
+function fmtDate(ds){if(!ds)return"—";return new Date(ds).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}
+function daysLeft(rd){let t=new Date();t.setHours(0,0,0,0);let r=new Date(rd);r.setHours(0,0,0,0);return Math.ceil((r-t)/86400000)}
+function statusOf(dl){if(dl<0)return"expired";if(dl<=3)return"critical";if(dl<=7)return"warning";return"active"}
+function isTaken(members,seatNum,timing,excludeId){
+  if(catOf(seatNum)==="res")return members.some(m=>+m.seatNumber===+seatNum&&m.id!==excludeId);
+  return members.some(m=>+m.seatNumber===+seatNum&&m.timing===timing&&m.id!==excludeId);
+}
+function isSeatFullyBooked(members,seatNum){
+  let timings=timingsOf(seatNum);
+  if(timings.length===0)return members.some(m=>+m.seatNumber===+seatNum);
+  return timings.every(t=>members.some(m=>+m.seatNumber===+seatNum&&m.timing===t));
+}
+// ══════════════════════════════════════════════
+// JSONBin.io — Online Free Database
+// Har student ka data yahan save hoga
+// Admin kisi bhi device se dekh sakta hai
+// ══════════════════════════════════════════════
+const JBIN_KEY  = "$2a$10$VG0edm4klaYSIlXlb3gAteOZkHFoLxTy9amD9pCQFm.Kafz4T4QbK";
+// JBIN_BIN — pehli baar "JSONBIN_BIN_ID_HERE", phir localStorage se
+let JBIN_BIN = localStorage.getItem("sl_bin") || "JSONBIN_BIN_ID_HERE";
+let   _jbinSaving = false;
+
+async function jbinGet(){
+  try{
+    JBIN_BIN=localStorage.getItem("sl_bin")||JBIN_BIN;
+  let r=await fetch("https://api.jsonbin.io/v3/b/"+JBIN_BIN+"/latest",
+      {headers:{"X-Master-Key":JBIN_KEY,"X-Bin-Meta":"false"}});
+    if(!r.ok)throw new Error("fetch fail");
+    return await r.json();
+  }catch(e){return null}
+}
+
+async function jbinSet(d){
+  if(_jbinSaving)return;
+  _jbinSaving=true;
+  // Photos hata ke save karo (file size bahut badi ho jaati)
+  let clean={members:d.members.map(m=>{
+    let c=Object.assign({},m);delete c.passportPhoto;delete c.aadhaarPhoto;return c;
+  })};
+  // Photos locally rakhte hain
+  let photos={};
+  d.members.forEach(m=>{
+    if(m.passportPhoto)photos[m.id+"_p"]=m.passportPhoto;
+    if(m.aadhaarPhoto) photos[m.id+"_a"]=m.aadhaarPhoto;
+  });
+  try{localStorage.setItem("sl_ph",JSON.stringify(photos));}catch(e){}
+  try{
+    let r=await fetch("https://api.jsonbin.io/v3/b/"+JBIN_BIN,{
+      method:"PUT",
+      headers:{"Content-Type":"application/json","X-Master-Key":JBIN_KEY},
+      body:JSON.stringify(clean)
+    });
+    if(!r.ok)throw new Error("save fail");
+  }catch(e){
+    // Fallback: localStorage
+    try{localStorage.setItem(SK,JSON.stringify(d));}catch(le){}
+  }finally{_jbinSaving=false;}
+}
+
+function mergePhotos(d){
+  let ph={};
+  try{ph=JSON.parse(localStorage.getItem("sl_ph")||"{}");}catch(e){}
+  d.members=d.members.map(m=>Object.assign({},m,{
+    passportPhoto:ph[m.id+"_p"]||null,
+    aadhaarPhoto :ph[m.id+"_a"]||null
+  }));
+  return d;
+}
+
+function loadData(){
+  try{let d=JSON.parse(localStorage.getItem(SK)||"{}");return d.members?d:{members:[]};}
+  catch{return{members:[]};}
+}
+function saveData(d){
+  // Local save turant (fast UI)
+  try{localStorage.setItem(SK,JSON.stringify(d));}catch(e){}
+  // Online save (async, background)
+  jbinSet(d);
+}
+function enriched(){
+  return data.members.map(m=>{let dl=daysLeft(m.renewalDate);return{...m,daysLeft:dl,status:statusOf(dl),seatType:labelOf(m.seatNumber,m.timing)}});
+}
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let data = loadData();
+let state = {
+  screen:"landing", adminView:"dashboard",
+  regStep:"phone", isAdmin:false, currentStudent:null,
+  phoneInput:"", otpSent:false, otpCode:"", otpInput:"",
+  regForm:{name:"",fatherName:"",aadhaar:"",address:"",passportPhoto:null,passportPhotoName:"",aadhaarPhoto:null,aadhaarPhotoName:"",admissionDate:todayStr()},
+  selectedSeat:null, selectedTiming:null, paymentMethod:null,
+  _isRenewal:false, _renewId:null,
+  search:"", filterStatus:"all",
+  showForm:false, editId:null,
+  adminForm:{seatNumber:"",timing:"",admissionDate:todayStr()},
+  adminFormText:{name:"",phone:"",cnic:"",fatherName:"",address:"",notes:""},
+  confirmRenew:null, confirmDelete:null, showBackup:false,
+  toast:null, adminPassInput:"", showAdminLogin:false,
+};
+
+function setState(patch){state={...state,...patch};render()}
+
+// ══════════════════════════════════════════════
+// DOM HELPER
+// ══════════════════════════════════════════════
+function h(tag,attrs,...children){
+  let el=document.createElement(tag);
+  if(attrs)Object.entries(attrs).forEach(([k,v])=>{
+    if(k==="className")el.className=v;
+    else if(k==="style"&&typeof v==="object")Object.assign(el.style,v);
+    else if(k.startsWith("on")&&typeof v==="function")el.addEventListener(k.slice(2).toLowerCase(),v);
+    else if(k==="disabled")el.disabled=v;
+    else if(k==="value"&&(tag==="input"||tag==="select"||tag==="textarea"))el.value=v||"";
+    else if(k==="checked")el.checked=v;
+    else if(k==="dataset")Object.entries(v).forEach(([dk,dv])=>el.dataset[dk]=dv);
+    else el.setAttribute(k,v);
+  });
+  children.flat(Infinity).forEach(c=>{
+    if(c==null||c===false)return;
+    if(typeof c==="string"||typeof c==="number")el.appendChild(document.createTextNode(c));
+    else el.appendChild(c);
+  });
+  return el;
+}
+
+let _toast=null;
+function showToast(text,type="ok"){
+  if(_toast)clearTimeout(_toast);
+  setState({toast:{text,type}});
+  _toast=setTimeout(()=>setState({toast:null}),3200);
+}
+
+// ══════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════
+function render(){
+  let saveSearch=null,saveSel=[null,null];
+  let ae=document.activeElement;
+  if(ae&&ae.dataset&&ae.dataset.persist){saveSearch=ae.dataset.persist;try{saveSel=[ae.selectionStart,ae.selectionEnd]}catch(e){}}
+  let app=document.getElementById("app");
+  app.innerHTML="";
+  app.appendChild(buildHeader());
+  if(state.screen==="landing")app.appendChild(buildLanding());
+  else if(state.screen==="student")app.appendChild(buildStudentPortal());
+  else if(state.screen==="admin")app.appendChild(buildAdminPortal());
+  if(state.showAdminLogin)app.appendChild(buildAdminLoginModal());
+  if(state.confirmRenew)app.appendChild(buildRenewModal());
+  if(state.confirmDelete)app.appendChild(buildDeleteModal());
+  if(state.showForm&&state.isAdmin)app.appendChild(buildAdminFormModal());
+  if(state.showBackup)app.appendChild(buildBackupModal());
+  if(state.toast){app.appendChild(h("div",{className:"toast "+state.toast.type},state.toast.text))}
+  if(saveSearch){let el=app.querySelector(`[data-persist="${saveSearch}"]`);if(el){el.focus();try{el.setSelectionRange(saveSel[0],saveSel[1])}catch(e){}}}
+  setTimeout(()=>{
+    let qrDiv=document.getElementById("qrcode");
+    if(qrDiv&&qrDiv.innerHTML===""){
+      let amount=feeOf(state.selectedSeat,state.selectedTiming);
+      let upiUrl=`upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${amount}&cu=INR&tn=Library+Seat+Booking`;
+      try{new QRCode(qrDiv,{text:upiUrl,width:140,height:140,colorDark:"#000000",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.M})}catch(e){}
+    }
+  },100);
+}
+
+// ══════════════════════════════════════════════
+// HEADER
+// ══════════════════════════════════════════════
+function buildHeader(){
+  let em=enriched();
+  let expC=em.filter(m=>m.status==="expired").length;
+  let wrap=h("div",{});
+  if(expC>0&&state.isAdmin){
+    let alert=h("div",{className:"renew-alert"});
+    alert.appendChild(h("span",{},"⚠️"));
+    alert.appendChild(h("span",{className:"badge"},expC+" Expired"));
+    alert.appendChild(h("span",{style:{color:"rgba(245,158,11,.8)"}},"members ki renewal pending hai!"));
+    wrap.appendChild(alert);
+  }
+  let header=h("div",{className:"header"});
+  let left=h("div",{className:"logo"});
+  left.appendChild(h("div",{className:"logo-icon"},"📚"));
+  let linfo=h("div",{});
+  linfo.appendChild(h("div",{className:"logo-name"},"SmartLib"));
+  linfo.appendChild(h("div",{className:"logo-sub"},"Seat Booking Portal"));
+  left.appendChild(linfo);
+  header.appendChild(left);
+  let right=h("div",{className:"header-right"});
+  if(state.isAdmin){
+    right.appendChild(h("span",{className:"admin-label"},"🔐 Admin"));
+    right.appendChild(h("button",{className:"btn btn-ghost btn-sm",onClick:()=>setState({isAdmin:false,screen:"landing",adminView:"dashboard"})},"Exit"));
+  } else if(state.currentStudent){
+    let m=data.members.find(m=>m.id===state.currentStudent);
+    right.appendChild(h("span",{style:{fontSize:"12px",color:"var(--muted2)",fontWeight:"700"}},m?m.name.split(" ")[0]:""));
+    right.appendChild(h("button",{className:"btn btn-ghost btn-sm",onClick:()=>setState({currentStudent:null,screen:"landing",regStep:"phone",selectedSeat:null,selectedTiming:null})},"Logout"));
+  } else if(state.screen!=="landing"){
+    right.appendChild(h("button",{className:"btn btn-ghost btn-sm",onClick:()=>setState({screen:"landing"})},"← Wapas"));
+  }
+  header.appendChild(right);
+  wrap.appendChild(header);
+  return wrap;
+}
+
+// ══════════════════════════════════════════════
+// LANDING
+// ══════════════════════════════════════════════
+function buildLanding(){
+  let em=enriched();
+  // Count available excluding hidden seats
+  let allSlots=[];
+  for(let i=1;i<=100;i++){
+    if(HIDDEN_SEATS.includes(i))continue;
+    let cat=catOf(i);
+    if(!cat)continue;
+    let ts=timingsOf(i);
+    if(ts.length>0)ts.forEach(t=>allSlots.push(i+"_"+t));
+    else allSlots.push(i+"_res");
+  }
+  let takenSlots=data.members.reduce((acc,m)=>{acc.add(m.seatNumber+"_"+(m.timing||"res"));return acc},new Set());
+  let availSlots=allSlots.length-takenSlots.size;
+
+  let wrap=h("div",{});
+  let hero=h("div",{className:"landing-hero"});
+  hero.appendChild(h("div",{className:"hero-badge"},"🏛️ Library Seat Portal"));
+  let title=h("div",{className:"hero-title"});
+  title.innerHTML="Ghar Baithe<br><span>Seat Book Karo!</span>";
+  hero.appendChild(title);
+  hero.appendChild(h("div",{className:"hero-sub"},"Mobile OTP se verify karo, apni seat chunao, UPI se payment karo. Bilkul aasaan — sab online!"));
+
+  let statsRow=h("div",{className:"hero-stats"});
+  [{v:data.members.length,l:"Members",c:"#3b82f6"},{v:availSlots,l:"Available",c:"#10b981"},{v:takenSlots.size,l:"Booked",c:"#f59e0b"}].forEach(s=>{
+    let sc=h("div",{className:"hero-stat"});
+    sc.appendChild(h("div",{className:"hero-stat-val",style:{color:s.c}},s.v));
+    sc.appendChild(h("div",{className:"hero-stat-lbl"},s.l));
+    statsRow.appendChild(sc);
+  });
+  hero.appendChild(statsRow);
+  wrap.appendChild(hero);
+
+  let cards=h("div",{className:"landing-cards content"});
+
+  let sc=h("div",{className:"land-card",style:{"--accent":"#3b82f6"},onClick:()=>{
+    if(state.currentStudent)setState({screen:"student",regStep:"seat"});
+    else setState({screen:"student",regStep:"phone"});
+  }});
+  sc.appendChild(h("div",{className:"land-card-icon"},"🎓"));
+  sc.appendChild(h("div",{className:"land-card-title"},"Student Portal"));
+  sc.appendChild(h("div",{className:"land-card-desc"},"Mobile OTP se verify karo, seat book karo, renewal karo. Puri process online!"));
+  sc.appendChild(h("button",{className:"btn btn-primary",style:{marginTop:"14px",pointerEvents:"none"}},state.currentStudent?"My Dashboard →":"Register / Login →"));
+  cards.appendChild(sc);
+
+  let ac=h("div",{className:"land-card",style:{"--accent":"#f59e0b"},onClick:()=>{
+    if(state.isAdmin)setState({screen:"admin"});
+    else setState({showAdminLogin:true});
+  }});
+  ac.appendChild(h("div",{className:"land-card-icon"},"🔐"));
+  ac.appendChild(h("div",{className:"land-card-title"},"Admin Panel"));
+  ac.appendChild(h("div",{className:"land-card-desc"},"Sab members ka record, renewals, payments, backup aur poori library manage karo."));
+  ac.appendChild(h("button",{className:"btn btn-amber",style:{marginTop:"14px",pointerEvents:"none"}},state.isAdmin?"Admin Dashboard →":"Admin Login →"));
+  cards.appendChild(ac);
+
+  wrap.appendChild(cards);
+  return wrap;
+}
+
+// ══════════════════════════════════════════════
+// STUDENT PORTAL
+// ══════════════════════════════════════════════
+function buildStudentPortal(){
+  let wrap=h("div",{});
+  wrap.appendChild(buildStepNav());
+  let content=h("div",{className:"content"});
+  if(state.regStep==="phone")content.appendChild(buildPhoneStep());
+  else if(state.regStep==="otp")content.appendChild(buildOTPStep());
+  else if(state.regStep==="register")content.appendChild(buildRegisterStep());
+  else if(state.regStep==="seat"){
+    if(state.currentStudent){
+      let m=enriched().find(m=>m.id===state.currentStudent);
+      if(m)content.appendChild(buildMySeatCard(m));
+    }
+    content.appendChild(buildSeatMapStep());
+  }
+  else if(state.regStep==="payment")content.appendChild(buildPaymentStep());
+  else if(state.regStep==="success")content.appendChild(buildSuccessStep());
+  wrap.appendChild(content);
+  return wrap;
+}
+
+function buildStepNav(){
+  let steps=[
+    {id:"phone",n:1,l:"Phone"},
+    {id:"otp",n:2,l:"OTP"},
+    {id:"register",n:3,l:"Details"},
+    {id:"seat",n:4,l:"Seat"},
+    {id:"payment",n:5,l:"Payment"},
+    {id:"success",n:6,l:"Done"}
+  ];
+  let order=["phone","otp","register","seat","payment","success"];
+  let curIdx=order.indexOf(state.regStep);
+  let nav=h("div",{className:"step-nav"});
+  let track=h("div",{className:"step-track"});
+  steps.forEach((s,i)=>{
+    let cls="step-dot "+(i<curIdx?"done":i===curIdx?"active":"pending");
+    let dot=h("div",{className:cls},i<curIdx?"✓":String(s.n));
+    track.appendChild(dot);
+    if(i<steps.length-1){
+      let line=h("div",{className:"step-line"+(i<curIdx?" done":"")});
+      track.appendChild(line);
+    }
+  });
+  nav.appendChild(track);
+  let labels=h("div",{className:"step-labels"});
+  steps.forEach((s,i)=>labels.appendChild(h("span",{style:{color:i<=curIdx?"var(--text)":"var(--muted)",transition:"color .3s"}},s.l)));
+  nav.appendChild(labels);
+  return nav;
+}
+
+// STEP 1: PHONE
+function buildPhoneStep(){
+  let wrap=h("div",{className:"otp-wrap"});
+  wrap.appendChild(h("div",{style:{fontSize:"36px",textAlign:"center",marginBottom:"10px"}},"📱"));
+  wrap.appendChild(h("div",{className:"otp-title"},"Mobile Number Darj Karein"));
+  wrap.appendChild(h("div",{className:"otp-sub"},"Apna number enter karein. Agar pehle se member hain toh OTP se login hoga, warna registration shuru hogi."));
+  let phoneF=h("div",{className:"field"});
+  phoneF.appendChild(h("label",{},"Mobile Number *"));
+  phoneF.appendChild(h("input",{className:"inp",type:"tel",placeholder:"9876543210",value:state.phoneInput,dataset:{persist:"reg-phone"},onInput:e=>state.phoneInput=e.target.value,onKeydown:e=>{if(e.key==="Enter")sendOTP()}}));
+  wrap.appendChild(phoneF);
+  wrap.appendChild(h("button",{className:"btn btn-primary btn-full",style:{marginTop:"4px"},onClick:()=>sendOTP()},"OTP Bhejo →"));
+  let hint=h("div",{style:{marginTop:"18px",padding:"14px",background:"var(--bg3)",border:"1px solid var(--border)",borderRadius:"var(--r2)",fontSize:"12px",color:"var(--muted2)",lineHeight:"1.75"}});
+  hint.appendChild(h("div",{style:{fontWeight:"700",color:"var(--text)",marginBottom:"6px"}},"💡 Kaise kaam karta hai?"));
+  hint.appendChild(h("div",{},"• Naye student: Register karke seat book karein"));
+  hint.appendChild(h("div",{},"• Purane member: OTP se login karein"));
+  wrap.appendChild(hint);
+  return wrap;
+}
+
+function sendOTP(){
+  let inp=document.querySelector('[data-persist="reg-phone"]');
+  let phone=inp?inp.value.trim():state.phoneInput.trim();
+  if(!phone||phone.length<10){showToast("Sahi mobile number daalo!","err");return}
+  state.phoneInput=phone;
+  let otp=Math.floor(100000+Math.random()*900000).toString();
+  state.otpCode=otp;state.otpInput="";
+  setState({regStep:"otp",otpSent:true});
+  setTimeout(()=>showToast("OTP: "+otp+" (Demo mode)","info"),200);
+}
+
+// STEP 2: OTP
+function buildOTPStep(){
+  let wrap=h("div",{className:"otp-wrap"});
+  wrap.appendChild(h("div",{style:{fontSize:"36px",textAlign:"center",marginBottom:"10px"}},"🔢"));
+  wrap.appendChild(h("div",{className:"otp-title"},"OTP Verify Karein"));
+  wrap.appendChild(h("div",{className:"otp-sub"},"6-digit OTP aapke number par bheja gaya hai"));
+  wrap.appendChild(h("div",{className:"phone-display"},"📱 "+state.phoneInput));
+  let otpRow=h("div",{className:"otp-inputs"});
+  let inputs=[];
+  for(let i=0;i<6;i++){
+    let inp=h("input",{className:"otp-inp",type:"tel",maxlength:"1",dataset:{persist:"otp-"+i},
+      onInput:e=>{
+        e.target.value=e.target.value.replace(/\D/g,"").slice(0,1);
+        let val=inputs.map(x=>x.value).join("");
+        state.otpInput=val;
+        if(e.target.value&&i<5)inputs[i+1].focus();
+        if(val.length===6)verifyOTP();
+      },
+      onKeydown:e=>{if(e.key==="Backspace"&&!e.target.value&&i>0)inputs[i-1].focus();}
+    });
+    inputs.push(inp);otpRow.appendChild(inp);
+  }
+  wrap.appendChild(otpRow);
+  let demoBox=h("div",{className:"demo-otp-box"});
+  demoBox.appendChild(h("div",{style:{fontSize:"11px",color:"var(--muted2)",marginBottom:"4px"}},"🧪 Demo Mode — Aapka OTP:"));
+  demoBox.appendChild(h("div",{style:{fontSize:"22px",fontWeight:"800",fontFamily:"'Space Mono',monospace",color:"var(--cyan)",letterSpacing:"8px"}},state.otpCode));
+  wrap.appendChild(demoBox);
+  wrap.appendChild(h("button",{className:"btn btn-primary btn-full",onClick:()=>verifyOTP()},"✅ OTP Verify Karo"));
+  let acts=h("div",{style:{display:"flex",gap:"8px",marginTop:"10px"}});
+  acts.appendChild(h("button",{className:"btn btn-ghost btn-full",onClick:()=>setState({regStep:"phone"})},"← Wapas"));
+  acts.appendChild(h("button",{className:"btn btn-ghost btn-full",onClick:()=>sendOTP()},"🔄 Dobara Bhejo"));
+  wrap.appendChild(acts);
+  return wrap;
+}
+
+function verifyOTP(){
+  let otp="";
+  for(let i=0;i<6;i++){let inp=document.querySelector(`[data-persist="otp-${i}"]`);if(inp)otp+=inp.value;}
+  if(otp.length<6){showToast("Poora OTP daalo!","err");return}
+  if(otp!==state.otpCode){showToast("Galat OTP! Dobara try karo.","err");return}
+  let existing=data.members.find(m=>m.phone===state.phoneInput);
+  if(existing){setState({currentStudent:existing.id,regStep:"seat"});showToast("Welcome back, "+existing.name+"! 👋")}
+  else{setState({regStep:"register"});showToast("OTP verified! Ab registration karein.","info")}
+}
+
+// STEP 3: REGISTRATION
+function buildRegisterStep(){
+  let wrap=h("div",{});
+  wrap.appendChild(h("div",{className:"page-title"},"📝 Registration Form"));
+  wrap.appendChild(h("div",{className:"page-sub"},"Apni puri details sahi sahi bharein"));
+  wrap.appendChild(h("div",{className:"warn-box"},"⚠️ Tamam fields zaroori hain. Galat info dene par membership cancel ho sakti hai."));
+
+  let r1=h("div",{className:"field-row"});
+  let nf=h("div",{className:"field"});nf.appendChild(h("label",{},"Poora Naam *"));nf.appendChild(h("input",{className:"inp",type:"text",placeholder:"Jaise: Rahul Kumar",value:state.regForm.name,dataset:{persist:"r-name"},onInput:e=>state.regForm.name=e.target.value}));r1.appendChild(nf);
+  let ff=h("div",{className:"field"});ff.appendChild(h("label",{},"Father's Name *"));ff.appendChild(h("input",{className:"inp",type:"text",placeholder:"Jaise: Suresh Kumar",value:state.regForm.fatherName,dataset:{persist:"r-father"},onInput:e=>state.regForm.fatherName=e.target.value}));r1.appendChild(ff);
+  wrap.appendChild(r1);
+
+  let aaF=h("div",{className:"field"});
+  aaF.appendChild(h("label",{},"Aadhaar Number * (12 digit)"));
+  aaF.appendChild(h("input",{className:"inp",type:"tel",placeholder:"XXXX XXXX XXXX",maxlength:"14",value:state.regForm.aadhaar?state.regForm.aadhaar.replace(/(\d{4})(\d{4})(\d{4})/,"$1 $2 $3").trim():"",dataset:{persist:"r-aadhaar"},
+    onInput:e=>{let v=e.target.value.replace(/\D/g,"").slice(0,12);let fmt=v.replace(/(\d{4})(\d{4})(\d{4})/,"$1 $2 $3").trim();e.target.value=fmt;state.regForm.aadhaar=v;}}));
+  wrap.appendChild(aaF);
+
+  let adF=h("div",{className:"field"});
+  adF.appendChild(h("label",{},"Pura Pata / Address *"));
+  adF.appendChild(h("textarea",{className:"inp",placeholder:"Ghar no., Mohalla, Shehar, PIN Code",value:state.regForm.address,dataset:{persist:"r-addr"},onInput:e=>state.regForm.address=e.target.value}));
+  wrap.appendChild(adF);
+
+  // ━━ PHOTO UPLOAD — PROPERLY FIXED ━━
+  let photoRow=h("div",{className:"field-row",style:{alignItems:"start"}});
+
+  // Passport Photo
+  let passF=h("div",{className:"field"});
+  passF.appendChild(h("label",{},"Passport Size Photo *"));
+  let passWrap=h("div",{className:"photo-upload-wrap",onClick:()=>triggerPhotoInput("passport")});
+  let passBox=h("div",{className:"photo-upload-box"+(state.regForm.passportPhoto?" has-photo":"")});
+  if(state.regForm.passportPhoto){
+    passBox.appendChild(h("img",{className:"photo-preview-img",src:state.regForm.passportPhoto,alt:"Photo"}));
+    passBox.appendChild(h("div",{className:"photo-success-name"},"✅ "+state.regForm.passportPhotoName));
+  } else {
+    passBox.appendChild(h("div",{className:"photo-upload-icon"},"🤳"));
+    passBox.appendChild(h("div",{className:"photo-upload-text"},"Tap karke photo upload karein"));
+    passBox.appendChild(h("div",{className:"photo-upload-hint"},"JPG/PNG — Max 500KB"));
+  }
+  passWrap.appendChild(passBox);
+  passF.appendChild(passWrap);
+  photoRow.appendChild(passF);
+
+  // Aadhaar Photo
+  let aaPhF=h("div",{className:"field"});
+  aaPhF.appendChild(h("label",{},"Aadhaar Card Photo *"));
+  let aaWrap=h("div",{className:"photo-upload-wrap",onClick:()=>triggerPhotoInput("aadhaar")});
+  let aaBox=h("div",{className:"photo-upload-box"+(state.regForm.aadhaarPhoto?" has-photo":"")});
+  if(state.regForm.aadhaarPhoto){
+    aaBox.appendChild(h("img",{className:"photo-preview-img",src:state.regForm.aadhaarPhoto,alt:"Aadhaar",style:{width:"90px",height:"56px",borderRadius:"6px"}}));
+    aaBox.appendChild(h("div",{className:"photo-success-name"},"✅ "+state.regForm.aadhaarPhotoName));
+  } else {
+    aaBox.appendChild(h("div",{className:"photo-upload-icon"},"🪪"));
+    aaBox.appendChild(h("div",{className:"photo-upload-text"},"Aadhaar card ki photo upload karein"));
+    aaBox.appendChild(h("div",{className:"photo-upload-hint"},"JPG/PNG/PDF"));
+  }
+  aaWrap.appendChild(aaBox);
+  aaPhF.appendChild(aaWrap);
+  photoRow.appendChild(aaPhF);
+  wrap.appendChild(photoRow);
+
+  let dateF=h("div",{className:"field"});
+  dateF.appendChild(h("label",{},"Join Date"));
+  dateF.appendChild(h("input",{className:"inp",type:"date",value:state.regForm.admissionDate,onInput:e=>setState({regForm:{...state.regForm,admissionDate:e.target.value}})}));
+  wrap.appendChild(dateF);
+
+  let acts=h("div",{style:{display:"flex",gap:"8px",marginTop:"8px"}});
+  acts.appendChild(h("button",{className:"btn btn-ghost",onClick:()=>setState({regStep:"phone"})},"← Wapas"));
+  acts.appendChild(h("button",{className:"btn btn-primary",style:{flex:"1"},onClick:()=>submitRegistration()},"Seat Chunao →"));
+  wrap.appendChild(acts);
+  return wrap;
+}
+
+// PHOTO INPUT — PROPER FIX using hidden input approach
+function triggerPhotoInput(type){
+  let inp=document.createElement("input");
+  inp.type="file";
+  inp.accept="image/*,application/pdf";
+  inp.style.cssText="position:fixed;top:-9999px;left:-9999px;opacity:0;width:1px;height:1px";
+  document.body.appendChild(inp);
+  inp.addEventListener("change",function(e){
+    let file=e.target.files[0];
+    if(!file){document.body.removeChild(inp);return}
+    // Size check - only for passport photo (100KB limit removed, now 500KB for better compatibility)
+    if(file.size>5*1024*1024){showToast("File 5MB se choti honi chahiye!","err");document.body.removeChild(inp);return}
+    let reader=new FileReader();
+    reader.onload=function(ev){
+      if(type==="passport"){
+        state.regForm.passportPhoto=ev.target.result;
+        state.regForm.passportPhotoName=file.name;
+      } else {
+        state.regForm.aadhaarPhoto=ev.target.result;
+        state.regForm.aadhaarPhotoName=file.name;
+      }
+      document.body.removeChild(inp);
+      render();
+      showToast(type==="passport"?"Passport photo upload! ✅":"Aadhaar photo upload! ✅");
+    };
+    reader.onerror=function(){showToast("Photo load nahi hui. Dobara try karein.","err");document.body.removeChild(inp);}
+    reader.readAsDataURL(file);
+  });
+  // Trigger click with a small delay for iOS
+  setTimeout(()=>inp.click(),50);
+}
+
+function submitRegistration(){
+  let ni=document.querySelector('[data-persist="r-name"]');
+  let fi=document.querySelector('[data-persist="r-father"]');
+  let ai=document.querySelector('[data-persist="r-aadhaar"]');
+  let adi=document.querySelector('[data-persist="r-addr"]');
+  if(ni)state.regForm.name=ni.value.trim();
+  if(fi)state.regForm.fatherName=fi.value.trim();
+  if(ai)state.regForm.aadhaar=ai.value.replace(/\s/g,"").trim();
+  if(adi)state.regForm.address=adi.value.trim();
+  if(!state.regForm.name){showToast("Naam zaroori hai!","err");return}
+  if(!state.regForm.fatherName){showToast("Father ka naam zaroori hai!","err");return}
+  if(!state.regForm.aadhaar||state.regForm.aadhaar.replace(/\s/g,"").length!==12){showToast("Sahi 12-digit Aadhaar number daalo!","err");return}
+  if(!state.regForm.address){showToast("Pata zaroori hai!","err");return}
+  if(!state.regForm.passportPhoto){showToast("Passport size photo upload karein!","err");return}
+  if(!state.regForm.aadhaarPhoto){showToast("Aadhaar card photo upload karein!","err");return}
+  setState({regStep:"seat"});
+  showToast("Details save ho gayi! Ab seat chunein.","info");
+}
+
+// STEP 4: SEAT MAP
+function buildSeatMapStep(){
+  let wrap=h("div",{});
+  let infoBox=h("div",{className:"seat-legend"});
+  [{c:"var(--green)",bg:"rgba(16,185,129,.08)",l:"Available"},{c:"#7c3aed",bg:"rgba(124,58,237,.06)",l:"Partial"},{c:"var(--amber)",bg:"rgba(245,158,11,.1)",l:"Meri Seat"},{c:"var(--border)",bg:"var(--bg2)",l:"Booked"}].forEach(li=>{
+    let item=h("div",{className:"legend-item"});
+    item.appendChild(h("div",{className:"legend-dot",style:{background:li.bg,border:"2px solid "+li.c}}));
+    item.appendChild(h("span",{style:{color:"var(--muted2)"}},li.l));
+    infoBox.appendChild(item);
+  });
+  wrap.appendChild(infoBox);
+
+  // Seat sections — hidden seats completely skipped
+  wrap.appendChild(buildSeatSection("🟡 Seats 1–20 (4 Ghante Slots) — ₹400/month",1,20));
+  wrap.appendChild(buildSeatSection("🟣 Seats 21–25 (6 Ghante Slots) — ₹400–600/month",21,25));
+  // Section 3: 26–100 excluding hidden (26 hidden, so shows 27–100 minus 48)
+  wrap.appendChild(buildSeatSection("🟢 Reserved Seats (Full Day) — ₹900/month",26,100));
+
+  if(state.selectedSeat){
+    let timings=timingsOf(state.selectedSeat);
+    if(timings.length>0)wrap.appendChild(buildTimingPanel(state.selectedSeat,timings));
+  }
+  if(state.selectedSeat&&(catOf(state.selectedSeat)==="res"||state.selectedTiming)){
+    let fee=feeOf(state.selectedSeat,state.selectedTiming);
+    let bar=h("div",{className:"seat-confirm-bar"});
+    let info=h("div",{className:"seat-confirm-info"});
+    info.appendChild(h("div",{className:"seat-confirm-title"},"Seat #"+state.selectedSeat+(state.selectedTiming?" — "+state.selectedTiming:"")));
+    info.appendChild(h("div",{className:"seat-confirm-sub"},labelOf(state.selectedSeat,state.selectedTiming)));
+    bar.appendChild(info);
+    bar.appendChild(h("div",{className:"seat-confirm-price"},"₹"+fee));
+    wrap.appendChild(bar);
+    wrap.appendChild(h("button",{className:"btn btn-primary btn-full",style:{marginTop:"10px"},onClick:()=>{
+      if(isTaken(data.members,state.selectedSeat,state.selectedTiming,state.currentStudent)){showToast("Yeh slot already booked hai!","err");return}
+      setState({regStep:"payment",paymentMethod:null});
+    }},"Aage Badho — Payment →"));
+  }
+  return wrap;
+}
+
+function buildSeatSection(title,from,to){
+  let section=h("div",{className:"seat-section"});
+  section.appendChild(h("div",{className:"seat-section-title"},title));
+  let grid=h("div",{className:"seat-grid"});
+  let anyVisible=false;
+  for(let i=from;i<=to;i++){
+    if(HIDDEN_SEATS.includes(i))continue; // ← Completely hidden, no trace
+    let cat=catOf(i);
+    if(!cat)continue;
+    anyVisible=true;
+    let full=isSeatFullyBooked(data.members,i);
+    let isMine=state.currentStudent&&data.members.some(m=>m.id===state.currentStudent&&+m.seatNumber===i);
+    let timings=timingsOf(i);
+    let partialAvail=!full&&timings.length>0&&timings.some(t=>!isTaken(data.members,i,t,null));
+    let clsArr=["seat-btn"];
+    if(isMine)clsArr.push("mine");
+    else if(full)clsArr.push("occupied");
+    else if(state.selectedSeat===i)clsArr.push("selected");
+    else if(partialAvail&&timings.length>0)clsArr.push("partial-avail");
+    else clsArr.push("available");
+
+    let btn=h("div",{className:clsArr.join(" "),onClick:()=>{
+      if(full&&!isMine){showToast("Seat #"+i+" full booked hai!","err");return}
+      if(isMine){showToast("Yeh aapki current seat hai!","info");return}
+      if(catOf(i)==="res")setState({selectedSeat:i,selectedTiming:""});
+      else setState({selectedSeat:i,selectedTiming:null});
+    }});
+    btn.appendChild(h("div",{className:"seat-num"},i));
+    btn.appendChild(h("div",{className:"seat-lbl"},full?"FULL":isMine?"MINE":catOf(i)==="res"?"RES":""));
+    grid.appendChild(btn);
+  }
+  if(!anyVisible){section.style.display="none"}
+  section.appendChild(grid);
+  return section;
+}
+
+function buildTimingPanel(seatNum,timings){
+  let panel=h("div",{className:"timing-panel"});
+  panel.appendChild(h("div",{style:{fontWeight:"700",fontSize:"13px",marginBottom:"10px"}},"⏰ Seat #"+seatNum+" — Timing Chunao"));
+  timings.forEach(t=>{
+    let taken=isTaken(data.members,seatNum,t,state.currentStudent);
+    let isSelected=state.selectedTiming===t;
+    let row=h("div",{className:"timing-row"+(isSelected?" t-selected":taken?" t-taken":""),onClick:()=>{if(!taken)setState({selectedTiming:t})}});
+    row.appendChild(h("span",{className:"t-label"},t));
+    let rr=h("div",{style:{display:"flex",gap:"8px",alignItems:"center"}});
+    rr.appendChild(h("span",{className:"t-price"},"₹"+feeOf(seatNum,t)));
+    rr.appendChild(h("span",{className:"t-status "+(taken?"t-taken-lbl":"t-avail")},taken?"Booked":"Available"));
+    row.appendChild(rr);
+    panel.appendChild(row);
+  });
+  return panel;
+}
+
+function buildMySeatCard(m){
+  let dl=m.daysLeft;
+  let badgeColor=dl<0?"#ef4444":dl<=7?"#f59e0b":"#10b981";
+  let badgeBg=dl<0?"rgba(239,68,68,.12)":dl<=7?"rgba(245,158,11,.12)":"rgba(16,185,129,.12)";
+  let card=h("div",{className:"my-seat-card"});
+  let top=h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}});
+  let left=h("div",{});
+  left.appendChild(h("div",{style:{fontSize:"10px",color:"var(--muted2)",fontWeight:"700",letterSpacing:".5px",textTransform:"uppercase",marginBottom:"4px"}},"Meri Current Seat"));
+  left.appendChild(h("div",{className:"my-seat-num"},"#"+m.seatNumber));
+  if(m.timing)left.appendChild(h("div",{style:{color:"#c4b5fd",fontWeight:"600",fontSize:"13px",marginTop:"3px"}},"⏰ "+m.timing));
+  left.appendChild(h("div",{className:"my-seat-sub"},m.seatType+" • ₹"+m.fee+"/month"));
+  left.appendChild(h("div",{className:"days-badge",style:{background:badgeBg,color:badgeColor}},dl<0?"Expired "+Math.abs(dl)+" din pehle":dl===0?"Aaj expire!":dl+" din bache"));
+  top.appendChild(left);
+  let right=h("div",{style:{textAlign:"right",flexShrink:"0"}});
+  right.appendChild(h("div",{style:{fontSize:"10px",color:"var(--muted2)",fontWeight:"600",marginBottom:"3px"}},"Valid Until"));
+  right.appendChild(h("div",{style:{fontSize:"13px",fontWeight:"700",color:dl<=7?"var(--amber)":"var(--text)"}},fmtDate(m.renewalDate)));
+  if(dl<=7)right.appendChild(h("button",{className:"btn btn-green btn-sm",style:{marginTop:"7px"},onClick:()=>setState({selectedSeat:m.seatNumber,selectedTiming:m.timing||"",regStep:"payment",paymentMethod:null,_isRenewal:true,_renewId:m.id})},"🔄 Renew Now"));
+  right.appendChild(h("button",{className:"btn btn-ghost btn-sm",style:{marginTop:"5px",display:"block",width:"100%"},onClick:()=>downloadPDF(m)},"📄 Receipt"));
+  top.appendChild(right);
+  card.appendChild(top);
+  return card;
+}
+
+// STEP 5: PAYMENT
+function buildPaymentStep(){
+  let wrap=h("div",{className:"payment-wrap"});
+  let fee=feeOf(state.selectedSeat,state.selectedTiming);
+  let isRenewal=state._isRenewal;
+  wrap.appendChild(h("div",{className:"page-title"},isRenewal?"🔄 Renewal Payment":"💳 Payment"));
+  wrap.appendChild(h("div",{className:"page-sub"},"Booking confirm karne ke liye payment karein"));
+
+  let summary=h("div",{className:"pay-summary"});
+  summary.appendChild(h("div",{style:{fontWeight:"800",fontSize:"14px",marginBottom:"12px"}},"📋 Order Summary"));
+  let rows=[["Seat Number","#"+state.selectedSeat],["Type",labelOf(state.selectedSeat,state.selectedTiming)],...(state.selectedTiming?[["Timing",state.selectedTiming]]:[]),["Duration","1 Month"],["Total Amount","₹"+fee]];
+  rows.forEach((r,i)=>{
+    let row=h("div",{className:"pay-row"});
+    row.appendChild(h("span",{style:{color:i===rows.length-1?"":"var(--muted2)"}},r[0]));
+    row.appendChild(h("span",{style:{fontFamily:"'Space Mono',monospace",color:i===rows.length-1?"var(--green3)":""}},r[1]));
+    summary.appendChild(row);
+  });
+  wrap.appendChild(summary);
+
+  wrap.appendChild(h("div",{style:{fontWeight:"700",fontSize:"13px",marginBottom:"10px"}},"Payment Method Chunao"));
+  let methods=h("div",{className:"pay-methods"});
+  [{id:"upi",icon:"📱",name:"UPI / QR Code"},{id:"cash",icon:"💵",name:"Cash (Admin ke paas)"}].forEach(pm=>{
+    let mc=h("div",{className:"pay-method"+(state.paymentMethod===pm.id?" selected":""),onClick:()=>setState({paymentMethod:pm.id})});
+    mc.appendChild(h("div",{className:"pay-icon"},pm.icon));
+    mc.appendChild(h("div",{className:"pay-name"},pm.name));
+    methods.appendChild(mc);
+  });
+  wrap.appendChild(methods);
+
+  if(state.paymentMethod==="upi"){
+    let upiBox=h("div",{style:{background:"var(--bg2)",border:"1px solid var(--border2)",borderRadius:"var(--r)",padding:"16px",marginBottom:"12px"}});
+    upiBox.appendChild(h("div",{style:{fontWeight:"700",fontSize:"13px",marginBottom:"12px",textAlign:"center"}},"📱 UPI Se Payment Karein"));
+    let qrWrap=h("div",{className:"qr-container"});
+    let pnbLogo=h("div",{style:{display:"flex",alignItems:"center",justifyContent:"center",gap:"8px",marginBottom:"10px"}});
+    pnbLogo.appendChild(h("div",{style:{background:"#1a237e",borderRadius:"5px",padding:"3px 9px",color:"#fff",fontWeight:"800",fontSize:"13px"}},"pnb"));
+    qrWrap.appendChild(pnbLogo);
+    let qrDiv=h("div",{id:"qrcode"});
+    qrWrap.appendChild(qrDiv);
+    qrWrap.appendChild(h("div",{className:"qr-upi"},UPI_ID));
+    qrWrap.appendChild(h("div",{className:"qr-name"},UPI_NAME));
+    qrWrap.appendChild(h("div",{style:{fontSize:"11px",color:"#555",marginTop:"4px"}},"Amount: ₹"+fee));
+    upiBox.appendChild(qrWrap);
+    upiBox.appendChild(h("div",{style:{textAlign:"center",fontSize:"11px",color:"var(--muted2)",margin:"10px 0"}},"— Ya apna UPI app mein ID type karein —"));
+    let upiIdBox=h("div",{style:{background:"var(--bg3)",border:"1px solid var(--border2)",borderRadius:"7px",padding:"11px",textAlign:"center",cursor:"pointer"},onClick:()=>{navigator.clipboard&&navigator.clipboard.writeText(UPI_ID).then(()=>showToast("UPI ID copy ho gayi! ✓")).catch(()=>{})}});
+    upiIdBox.appendChild(h("div",{style:{fontFamily:"'Space Mono',monospace",fontSize:"15px",fontWeight:"800",color:"var(--blue3)"}},"📋 "+UPI_ID));
+    upiIdBox.appendChild(h("div",{style:{fontSize:"10px",color:"var(--muted)",marginTop:"3px"}},"Tap karke copy karein"));
+    upiBox.appendChild(upiIdBox);
+    let upiNote=h("div",{style:{fontSize:"11px",color:"var(--muted2)",marginTop:"10px",lineHeight:"1.7"}});
+    upiNote.appendChild(h("div",{style:{fontWeight:"700",color:"var(--text)",marginBottom:"4px"}},"📌 Payment ke baad:"));
+    upiNote.appendChild(h("div",{},"• Screenshot ya transaction ID note kar lein"));
+    upiNote.appendChild(h("div",{},"• Neeche Submit button dabayein"));
+    upiBox.appendChild(upiNote);
+    wrap.appendChild(upiBox);
+  }
+  if(state.paymentMethod==="cash"){
+    wrap.appendChild(h("div",{className:"info-box"},"💡 Cash payment ke liye admin se milein. Admin aapki booking manually confirm karega."));
+  }
+  let acts=h("div",{style:{display:"flex",gap:"8px",marginTop:"8px"}});
+  acts.appendChild(h("button",{className:"btn btn-ghost",onClick:()=>setState({regStep:"seat",_isRenewal:false,_renewId:null})},"← Back"));
+  acts.appendChild(h("button",{className:"btn btn-green",style:{flex:"1"},disabled:!state.paymentMethod,onClick:()=>processPayment()},"✅ Confirm & Submit — ₹"+fee));
+  wrap.appendChild(acts);
+  return wrap;
+}
+
+function processPayment(){
+  if(!state.paymentMethod){showToast("Payment method chunao!","err");return}
+  let btn=document.querySelector('.btn-green:not([disabled])');
+  if(btn){btn.textContent="Processing...";btn.disabled=true}
+  setTimeout(()=>{
+    let fee=feeOf(state.selectedSeat,state.selectedTiming);
+    if(state._isRenewal&&state._renewId){
+      data.members=data.members.map(mem=>mem.id!==state._renewId?mem:{...mem,renewalDate:addMonth(mem.renewalDate),renewalHistory:[...(mem.renewalHistory||[]),{expired:mem.renewalDate,renewedOn:todayStr(),paidVia:state.paymentMethod,amount:fee}]});
+    } else {
+      let renewalDate=addMonth(state.regForm.admissionDate||todayStr());
+      let nm={id:Date.now(),name:state.regForm.name,fatherName:state.regForm.fatherName,phone:state.phoneInput,aadhaar:state.regForm.aadhaar,address:state.regForm.address,passportPhoto:state.regForm.passportPhoto,aadhaarPhoto:state.regForm.aadhaarPhoto,seatNumber:state.selectedSeat,timing:state.selectedTiming||"",admissionDate:state.regForm.admissionDate||todayStr(),renewalDate,fee,seatType:labelOf(state.selectedSeat,state.selectedTiming),paymentMethod:state.paymentMethod,renewalHistory:[{paidVia:state.paymentMethod,amount:fee,bookedOn:todayStr()}],notes:""};
+      data.members.push(nm);
+      state.currentStudent=nm.id;
+    }
+    saveData(data);
+    setState({regStep:"success",_isRenewal:false});
+    showToast("Payment successful! 🎉");
+  },1600);
+}
+
+// STEP 6: SUCCESS
+function buildSuccessStep(){
+  let m=enriched().find(m=>m.id===state.currentStudent);
+  let wrap=h("div",{className:"success-wrap"});
+  wrap.appendChild(h("div",{className:"success-icon"},"🎉"));
+  wrap.appendChild(h("div",{className:"success-title"},"Booking Confirmed!"));
+  wrap.appendChild(h("div",{className:"success-sub"},"Aapki seat successfully book ho gayi. Receipt save kar lijiye."));
+  if(m){
+    let receipt=h("div",{className:"receipt"});
+    [["👤 Naam",m.name],["👨 Father",m.fatherName||"—"],["📱 Phone",m.phone],["🪑 Seat","#"+m.seatNumber],["⏰ Timing",m.timing||"Full Day"],["📅 Valid Until",fmtDate(m.renewalDate)],["💳 Payment",m.paymentMethod==="upi"?"UPI/QR":"Cash"],["💰 Amount","₹"+m.fee]].forEach((r,i)=>{
+      let row=h("div",{className:"receipt-row"});
+      row.appendChild(h("span",{style:{color:"var(--muted2)"}},r[0]));
+      row.appendChild(h("span",{style:{fontWeight:"700",fontFamily:"'Space Mono',monospace"}},r[1]));
+      receipt.appendChild(row);
+    });
+    wrap.appendChild(receipt);
+    let actRow=h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px",marginBottom:"12px"}});
+    actRow.appendChild(h("button",{className:"btn btn-purple btn-full",onClick:()=>downloadPDF(m)},"📥 PDF Download"));
+    actRow.appendChild(h("button",{className:"btn btn-ghost btn-full",onClick:()=>printReceipt(m)},"🖨️ Print"));
+    wrap.appendChild(actRow);
+  }
+  wrap.appendChild(h("button",{className:"btn btn-primary btn-full",onClick:()=>setState({regStep:"seat",selectedSeat:null,selectedTiming:null,paymentMethod:null})},"← Dashboard par Jao"));
+  return wrap;
+}
+
+// ══════════════════════════════════════════════
+// PDF & PRINT
+// ══════════════════════════════════════════════
+function downloadPDF(m){
+  try{
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+    let y=20;
+    doc.setFillColor(5,12,26);doc.rect(0,0,210,42,"F");
+    doc.setTextColor(220,232,255);doc.setFontSize(20);doc.setFont("helvetica","bold");
+    doc.text("SmartLib — Seat Booking Receipt",15,18);
+    doc.setFontSize(10);doc.setFont("helvetica","normal");
+    doc.text("Seat Booking Portal",15,27);doc.text("Generated: "+new Date().toLocaleString("en-IN"),15,34);
+    y=54;
+    doc.setFillColor(240,245,255);doc.rect(10,y-8,190,128,"F");
+    doc.setFontSize(13);doc.setFont("helvetica","bold");doc.setTextColor(29,78,216);
+    doc.text("Member Details",15,y);y+=10;
+    doc.setFontSize(11);doc.setFont("helvetica","normal");doc.setTextColor(30,30,50);
+    [["Naam",m.name],["Father's Name",m.fatherName||"—"],["Mobile",m.phone],["Aadhaar",m.aadhaar?m.aadhaar.replace(/(\d{4})(\d{4})(\d{4})/,"$1 $2 $3"):"—"],["Address",m.address||"—"],["Seat Number","#"+m.seatNumber],["Timing",m.timing||"Full Day (Reserved)"],["Seat Type",m.seatType],["Admission",fmtDate(m.admissionDate)],["Valid Until",fmtDate(m.renewalDate)],["Payment",m.paymentMethod==="upi"?"UPI / QR Code":"Cash"],["Amount Paid","Rs. "+m.fee+"/-"]].forEach(([k,v])=>{
+      doc.setFont("helvetica","bold");doc.text(k+":",15,y);
+      doc.setFont("helvetica","normal");doc.text(String(v||""),80,y);
+      y+=9;
+    });
+    y+=8;
+    doc.setFillColor(29,78,216);doc.rect(10,y,190,1,"F");
+    y+=8;doc.setFontSize(10);doc.setTextColor(100,100,100);
+    doc.text("UPI: "+UPI_ID+" | Name: "+UPI_NAME,15,y);y+=8;
+    doc.text("Yeh receipt aapki seat booking ka pramaan hai.",15,y);
+    if(m.passportPhoto){try{doc.addImage(m.passportPhoto,"JPEG",166,46,28,34);doc.setFontSize(8);doc.setTextColor(100,100,100);doc.text("Photo",170,83);}catch(e){}}
+    doc.save("SmartLib-Seat"+m.seatNumber+"-"+m.name.replace(/\s+/g,"-")+".pdf");
+    showToast("PDF download ho raha hai! ✓");
+  }catch(e){console.error(e);showToast("PDF error! Print option try karein.","err")}
+}
+
+function printReceipt(m){
+  let w=window.open("","_blank","width=600,height=800");
+  if(!w){showToast("Popup block hai. Browser settings check karein.","err");return}
+  let aadhaarDisplay=m.aadhaar?m.aadhaar.replace(/(\d{4})(\d{4})(\d{4})/,"$1 $2 $3"):"—";
+  w.document.write(`<!DOCTYPE html><html><head><title>SmartLib Receipt</title>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<style>body{font-family:Arial,sans-serif;padding:20px;max-width:500px;margin:0 auto;color:#1a1a2e}.header{background:linear-gradient(135deg,#050c1a,#0c0e3a);color:white;padding:20px;border-radius:8px;margin-bottom:20px;text-align:center}.header h1{margin:0;font-size:18px}.header p{margin:4px 0 0;font-size:11px;opacity:.7}.receipt{border:2px solid #ddd;border-radius:8px;padding:20px}.row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #eee;font-size:13px}.row:last-child{border:none;font-weight:bold;font-size:15px;color:#059669}.lbl{color:#666}.val{font-weight:600;text-align:right;max-width:200px}.footer{margin-top:14px;font-size:11px;color:#888;text-align:center;border-top:1px solid #eee;padding-top:12px}.photo-wrap{display:flex;justify-content:flex-end;margin-bottom:12px}.photo-wrap img{width:78px;height:88px;object-fit:cover;border:2px solid #ccc;border-radius:4px}@media print{button{display:none}}</style>
+</head><body>
+<div class="header"><h1>📚 SmartLib — Booking Receipt</h1><p>${new Date().toLocaleString("en-IN")}</p></div>
+${m.passportPhoto?`<div class="photo-wrap"><img src="${m.passportPhoto}" alt="Photo"/></div>`:""}
+<div class="receipt">
+<div class="row"><span class="lbl">👤 Naam</span><span class="val">${m.name}</span></div>
+<div class="row"><span class="lbl">👨 Father</span><span class="val">${m.fatherName||"—"}</span></div>
+<div class="row"><span class="lbl">📱 Mobile</span><span class="val">${m.phone}</span></div>
+<div class="row"><span class="lbl">🪪 Aadhaar</span><span class="val">${aadhaarDisplay}</span></div>
+<div class="row"><span class="lbl">📍 Address</span><span class="val">${m.address||"—"}</span></div>
+<div class="row"><span class="lbl">🪑 Seat No.</span><span class="val">#${m.seatNumber}</span></div>
+<div class="row"><span class="lbl">⏰ Timing</span><span class="val">${m.timing||"Full Day"}</span></div>
+<div class="row"><span class="lbl">📌 Type</span><span class="val">${m.seatType}</span></div>
+<div class="row"><span class="lbl">📅 Admission</span><span class="val">${fmtDate(m.admissionDate)}</span></div>
+<div class="row"><span class="lbl">🔄 Valid Until</span><span class="val">${fmtDate(m.renewalDate)}</span></div>
+<div class="row"><span class="lbl">💳 Payment</span><span class="val">${m.paymentMethod==="upi"?"UPI/QR":"Cash"}</span></div>
+<div class="row"><span class="lbl">💰 Amount</span><span class="val">₹${m.fee}/-</span></div>
+</div>
+<div class="footer">UPI: ${UPI_ID} | ${UPI_NAME}<br>Yeh receipt aapki seat booking ka pramaan hai.</div>
+<br><button onclick="window.print()" style="width:100%;padding:12px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">🖨️ Print Karo</button>
+</body></html>`);
+  w.document.close();
+}
+
+// ══════════════════════════════════════════════
+// ADMIN PORTAL
+// ══════════════════════════════════════════════
+function buildAdminPortal(){
+  let wrap=h("div",{});
+  wrap.appendChild(buildAdminNav());
+  let content=h("div",{className:"content"});
+  if(state.adminView==="dashboard")content.appendChild(buildAdminDashboard());
+  else if(state.adminView==="seats")content.appendChild(buildAdminSeats());
+  else if(state.adminView==="members")content.appendChild(buildAdminMembers());
+  else if(state.adminView==="renewals")content.appendChild(buildAdminRenewals());
+  wrap.appendChild(content);
+  let bnav=h("div",{className:"bnav"});
+  [{v:"dashboard",i:"📊",l:"Dashboard"},{v:"seats",i:"🪑",l:"Seats"},{v:"members",i:"👥",l:"Members"},{v:"renewals",i:"🔄",l:"Renewals"}].forEach(nb=>{
+    let b=h("button",{className:"bnav-btn"+(state.adminView===nb.v?" active":""),onClick:()=>setState({adminView:nb.v})});
+    b.appendChild(h("span",{className:"bnav-icon"},nb.i));
+    b.appendChild(h("span",{},nb.l));
+    bnav.appendChild(b);
+  });
+  wrap.appendChild(bnav);
+  return wrap;
+}
+
+function buildAdminNav(){
+  let nav=h("div",{className:"top-nav"});
+  [{v:"dashboard",l:"📊 Dashboard"},{v:"seats",l:"🪑 Seat Map"},{v:"members",l:"👥 Members"},{v:"renewals",l:"🔄 Renewals"}].forEach(nb=>{
+    nav.appendChild(h("button",{className:"nav-btn"+(state.adminView===nb.v?" active":""),onClick:()=>setState({adminView:nb.v})},nb.l));
+  });
+  return nav;
+}
+
+function buildAdminDashboard(){
+  let em=enriched();
+  let expC=em.filter(m=>m.status==="expired").length;
+  let critC=em.filter(m=>m.status==="critical").length;
+  let activeC=em.filter(m=>m.status==="active").length;
+  let totalRevenue=data.members.filter(m=>!HIDDEN_SEATS.includes(+m.seatNumber)).reduce((a,m)=>a+m.fee,0);
+  let wrap=h("div",{});
+  wrap.appendChild(h("div",{className:"page-title"},"📊 Admin Dashboard"));
+  wrap.appendChild(h("div",{className:"page-sub"},"Library ka poora overview"));
+  let stats=h("div",{className:"stats"});
+  [{v:data.members.length,l:"Total Members",a:"#3b82f6"},{v:expC,l:"Expired",a:"#ef4444"},{v:critC,l:"Urgent (≤3d)",a:"#f59e0b"},{v:activeC,l:"Active",a:"#10b981"},{v:"₹"+totalRevenue,l:"Revenue",a:"#06b6d4"}].forEach(s=>{
+    let sc=h("div",{className:"stat",style:{"--accent":s.a}});
+    sc.appendChild(h("div",{className:"stat-val"},s.v));
+    sc.appendChild(h("div",{className:"stat-label"},s.l));
+    stats.appendChild(sc);
+  });
+  wrap.appendChild(stats);
+  let qabox=h("div",{className:"section-box"});
+  qabox.appendChild(h("div",{className:"sec-title"},"Quick Actions"));
+  let qarow=h("div",{style:{display:"flex",gap:"8px",flexWrap:"wrap"}});
+  qarow.appendChild(h("button",{className:"btn btn-primary",onClick:()=>openAdminAdd()},"+ Naya Member"));
+  qarow.appendChild(h("button",{className:"btn btn-amber",onClick:()=>setState({showBackup:true})},"💾 Backup"));
+  qarow.appendChild(h("button",{className:"btn btn-ghost",onClick:()=>setState({adminView:"renewals"})},"🔄 Renewals"));
+  qabox.appendChild(qarow);wrap.appendChild(qabox);
+  let expiring=em.filter(m=>m.daysLeft>=0&&m.daysLeft<=7).sort((a,b)=>a.daysLeft-b.daysLeft);
+  if(expiring.length>0){
+    let ebox=h("div",{className:"section-box"});
+    ebox.appendChild(h("div",{className:"sec-title"},"⚠️ Jaldi Expire Honge ("+expiring.length+")"));
+    expiring.slice(0,5).forEach(m=>{
+      let row=h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 0",borderBottom:"1px solid var(--border)"}});
+      let left=h("div",{});
+      left.appendChild(h("div",{style:{fontWeight:"700",fontSize:"14px"}},"#"+m.seatNumber+" — "+m.name));
+      left.appendChild(h("div",{style:{fontSize:"12px",color:"var(--muted2)"}},m.timing||"Reserved"));
+      row.appendChild(left);
+      let right=h("div",{style:{display:"flex",gap:"8px",alignItems:"center"}});
+      right.appendChild(h("span",{style:{fontSize:"12px",color:m.daysLeft<=3?"var(--red)":"var(--amber)",fontWeight:"700"}},m.daysLeft===0?"Aaj!":m.daysLeft+" din"));
+      right.appendChild(h("button",{className:"btn btn-green btn-sm",onClick:()=>setState({confirmRenew:m})},"Renew"));
+      row.appendChild(right);ebox.appendChild(row);
+    });
+    wrap.appendChild(ebox);
+  }
+  let recent=data.members.slice(-5).reverse();
+  let rbox=h("div",{className:"section-box"});
+  rbox.appendChild(h("div",{className:"sec-title"},"🆕 Recent Members"));
+  if(recent.length===0)rbox.appendChild(h("div",{className:"empty"},"Koi member nahi abhi"));
+  else recent.forEach(m=>{
+    let row=h("div",{style:{display:"flex",justifyContent:"space-between",padding:"8px 0",borderBottom:"1px solid var(--border)",fontSize:"13px",alignItems:"center"}});
+    let left=h("div",{style:{display:"flex",alignItems:"center",gap:"10px"}});
+    if(m.passportPhoto)left.appendChild(h("img",{src:m.passportPhoto,alt:"Photo",className:"member-photo",style:{width:"34px",height:"34px"}}));
+    let info=h("div",{});
+    info.appendChild(h("div",{style:{fontWeight:"700"}},"#"+m.seatNumber+" — "+m.name));
+    info.appendChild(h("div",{style:{fontSize:"11px",color:"var(--muted2)"}},m.seatType));
+    left.appendChild(info);
+    row.appendChild(left);
+    row.appendChild(h("div",{style:{color:"var(--muted2)",fontSize:"12px"}},fmtDate(m.admissionDate)));
+    rbox.appendChild(row);
+  });
+  wrap.appendChild(rbox);
+  return wrap;
+}
+
+function buildAdminSeats(){
+  let wrap=h("div",{});
+  wrap.appendChild(h("div",{className:"page-title"},"🪑 Seat Map"));
+  wrap.appendChild(h("div",{className:"page-sub"},"Library ki seat status"));
+  [{title:"🟡 Seats 1–20 (4Hr Slots)",from:1,to:20},{title:"🟣 Seats 21–25 (6Hr Slots)",from:21,to:25},{title:"🟢 Reserved Seats",from:26,to:100}].forEach(sec=>{
+    let section=h("div",{className:"seat-section"});
+    section.appendChild(h("div",{className:"seat-section-title"},sec.title));
+    let grid=h("div",{className:"seat-grid"});
+    for(let i=sec.from;i<=sec.to;i++){
+      if(HIDDEN_SEATS.includes(i))continue; // Hidden in admin too
+      let cat=catOf(i);if(!cat)continue;
+      let full=isSeatFullyBooked(data.members,i);
+      let btn=h("div",{className:"seat-btn "+(full?"occupied":"available")});
+      btn.appendChild(h("div",{className:"seat-num"},i));
+      btn.appendChild(h("div",{className:"seat-lbl"},full?"FULL":"FREE"));
+      if(full)btn.addEventListener("click",()=>{let occ=data.members.filter(m=>+m.seatNumber===i);showToast("Seat #"+i+": "+occ.map(m=>m.name).join(", "),"info");});
+      grid.appendChild(btn);
+    }
+    section.appendChild(grid);wrap.appendChild(section);
+  });
+  return wrap;
+}
+
+function buildAdminMembers(){
+  let wrap=h("div",{});
+  wrap.appendChild(h("div",{className:"page-title"},"👥 All Members"));
+  wrap.appendChild(h("div",{className:"page-sub"},"Sab registered members ki list"));
+  let srow=h("div",{className:"search-row"});
+  let sw=h("div",{className:"search-wrap"});
+  sw.appendChild(h("span",{className:"search-icon"},"🔍"));
+  sw.appendChild(h("input",{className:"inp",type:"search",placeholder:"Naam, Phone, Seat se dhundo...",value:state.search,dataset:{persist:"adm-search"},onInput:e=>setState({search:e.target.value})}));
+  srow.appendChild(sw);
+  let filterSel=h("select",{className:"inp",style:{width:"auto"},value:state.filterStatus,onChange:e=>setState({filterStatus:e.target.value})});
+  [["all","Sab"],["active","Active"],["warning","Warning"],["critical","Critical"],["expired","Expired"]].forEach(([v,l])=>{let o=h("option",{value:v},l);if(v===state.filterStatus)o.selected=true;filterSel.appendChild(o);});
+  srow.appendChild(filterSel);wrap.appendChild(srow);
+  let em=enriched();
+  let q=state.search.toLowerCase();
+  let filtered=em.filter(m=>{
+    let matchQ=!q||(m.name+m.phone+m.seatNumber+m.fatherName+(m.address||"")).toLowerCase().includes(q);
+    let matchS=state.filterStatus==="all"||m.status===state.filterStatus;
+    return matchQ&&matchS;
+  });
+  if(filtered.length===0){
+    let e=h("div",{className:"empty"});e.appendChild(h("div",{className:"empty-icon"},"🔍"));e.appendChild(h("div",{},"Koi member nahi mila"));wrap.appendChild(e);
+  } else {
+    filtered.forEach(m=>{
+      let sColor=colorOf(m.seatNumber);
+      let card=h("div",{className:"member-card",style:{"--seat-color":sColor}});
+      let top=h("div",{className:"mc-top"});
+      if(m.passportPhoto)top.appendChild(h("img",{src:m.passportPhoto,alt:"Photo",className:"member-photo"}));
+      top.appendChild(h("span",{className:"seat-badge",style:{background:sColor}},"#"+m.seatNumber));
+      top.appendChild(h("span",{className:"name-txt"},m.name));
+      let statusCls=m.status==="active"?"pill pill-active":m.status==="warning"?"pill pill-warn":m.status==="critical"?"pill pill-crit":"pill pill-exp";
+      top.appendChild(h("span",{className:statusCls},m.status.toUpperCase()));
+      card.appendChild(top);
+      let meta=h("div",{className:"mc-meta"});
+      meta.appendChild(h("span",{},"📱 "+m.phone));
+      if(m.fatherName)meta.appendChild(h("span",{},"👨 "+m.fatherName));
+      meta.appendChild(h("span",{style:{color:"#c4b5fd"}},m.timing||"Full Day"));
+      meta.appendChild(h("span",{},"₹"+m.fee+"/mo"));
+      meta.appendChild(h("span",{},m.daysLeft<0?"Expired "+Math.abs(m.daysLeft)+"d ago":m.daysLeft+"d left"));
+      card.appendChild(meta);
+      let acts=h("div",{className:"mc-acts"});
+      acts.appendChild(h("button",{className:"btn btn-green btn-sm",onClick:()=>setState({confirmRenew:m})},"🔄 Renew"));
+      acts.appendChild(h("button",{className:"btn btn-ghost btn-sm",onClick:()=>openAdminEdit(m)},"✏️ Edit"));
+      acts.appendChild(h("button",{className:"btn btn-ghost btn-sm",onClick:()=>downloadPDF(m)},"📄 PDF"));
+      acts.appendChild(h("button",{className:"btn btn-ghost btn-sm",onClick:()=>printReceipt(m)},"🖨️"));
+      acts.appendChild(h("button",{className:"btn btn-red btn-sm",onClick:()=>setState({confirmDelete:m})},"🗑️"));
+      card.appendChild(acts);
+      if(m.aadhaarPhoto){
+        let docRow=h("div",{style:{display:"flex",gap:"8px",marginTop:"8px",alignItems:"center"}});
+        docRow.appendChild(h("span",{style:{fontSize:"11px",color:"var(--muted2)"}},"🪪 Aadhaar:"));
+        let thumb=h("img",{src:m.aadhaarPhoto,alt:"Aadhaar",className:"doc-thumb"});
+        thumb.addEventListener("click",()=>{window.open(m.aadhaarPhoto,"_blank")});
+        docRow.appendChild(thumb);
+        card.appendChild(docRow);
+      }
+      wrap.appendChild(card);
+    });
+  }
+  return wrap;
+}
+
+function buildAdminRenewals(){
+  let em=enriched();
+  let wrap=h("div",{});
+  wrap.appendChild(h("div",{className:"page-title"},"🔄 Renewals"));
+  wrap.appendChild(h("div",{className:"page-sub"},"Jinki renewal pending hai"));
+  let groups=[{label:"🔴 Expired",list:em.filter(m=>m.status==="expired").sort((a,b)=>a.daysLeft-b.daysLeft)},{label:"🟠 Critical (≤3 days)",list:em.filter(m=>m.status==="critical").sort((a,b)=>a.daysLeft-b.daysLeft)},{label:"🟡 Warning (4–7 days)",list:em.filter(m=>m.status==="warning").sort((a,b)=>a.daysLeft-b.daysLeft)}];
+  groups.forEach(g=>{
+    if(g.list.length===0)return;
+    let box=h("div",{className:"section-box"});
+    box.appendChild(h("div",{className:"sec-title"},g.label+" ("+g.list.length+")"));
+    g.list.forEach(m=>{
+      let row=h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 0",borderBottom:"1px solid var(--border)"}});
+      let left=h("div",{});
+      left.appendChild(h("div",{style:{fontWeight:"700"}},"#"+m.seatNumber+" — "+m.name));
+      left.appendChild(h("div",{style:{fontSize:"12px",color:"var(--muted2)"}},"📱 "+m.phone+(m.timing?" | "+m.timing:"")));
+      left.appendChild(h("div",{style:{fontSize:"12px",color:"var(--muted2)"}},"Expires: "+fmtDate(m.renewalDate)+" | ₹"+m.fee));
+      row.appendChild(left);
+      let acts=h("div",{style:{display:"flex",gap:"6px"}});
+      acts.appendChild(h("button",{className:"btn btn-green btn-sm",onClick:()=>setState({confirmRenew:m})},"✅ Renew"));
+      row.appendChild(acts);box.appendChild(row);
+    });
+    wrap.appendChild(box);
+  });
+  if(groups.every(g=>g.list.length===0)){
+    let e=h("div",{className:"empty"});e.appendChild(h("div",{className:"empty-icon"},"✅"));e.appendChild(h("div",{},"Sab members ki renewal theek hai!"));wrap.appendChild(e);
+  }
+  return wrap;
+}
+
+// ADMIN FORM
+function openAdminAdd(){state.adminForm={seatNumber:"",timing:"",admissionDate:todayStr()};state.adminFormText={name:"",phone:"",cnic:"",fatherName:"",address:"",notes:""};setState({showForm:true,editId:null})}
+function openAdminEdit(m){
+  state.adminForm={seatNumber:String(m.seatNumber),timing:m.timing||"",admissionDate:m.admissionDate||todayStr()};
+  state.adminFormText={name:m.name||"",phone:m.phone||"",cnic:m.aadhaar||"",fatherName:m.fatherName||"",address:m.address||"",notes:m.notes||""};
+  setState({showForm:true,editId:m.id});
+}
+
+function buildAdminFormModal(){
+  let overlay=h("div",{className:"overlay"});
+  let modal=h("div",{className:"modal"});
+  modal.appendChild(h("div",{className:"drag"}));
+  modal.appendChild(h("div",{className:"modal-head"},state.editId?"✏️ Member Edit":"➕ Naya Member Add"));
+  function field(lbl,inp){let f=h("div",{className:"field"});f.appendChild(h("label",{},lbl));f.appendChild(inp);return f}
+  let r1=h("div",{className:"field-row"});
+  r1.appendChild(field("Naam *",h("input",{className:"inp",type:"text",value:state.adminFormText.name,dataset:{persist:"a-name"},placeholder:"Naam",onInput:e=>state.adminFormText.name=e.target.value})));
+  r1.appendChild(field("Father Name",h("input",{className:"inp",type:"text",value:state.adminFormText.fatherName,placeholder:"Father's Name",onInput:e=>state.adminFormText.fatherName=e.target.value})));
+  modal.appendChild(r1);
+  let r2=h("div",{className:"field-row"});
+  r2.appendChild(field("Phone *",h("input",{className:"inp",type:"tel",value:state.adminFormText.phone,placeholder:"Mobile",onInput:e=>state.adminFormText.phone=e.target.value})));
+  r2.appendChild(field("Aadhaar No.",h("input",{className:"inp",type:"tel",value:state.adminFormText.cnic,placeholder:"XXXX XXXX XXXX",onInput:e=>state.adminFormText.cnic=e.target.value})));
+  modal.appendChild(r2);
+  modal.appendChild(field("Address",h("textarea",{className:"inp",value:state.adminFormText.address,placeholder:"Pata...",onInput:e=>state.adminFormText.address=e.target.value})));
+  let r3=h("div",{className:"field-row"});
+  r3.appendChild(field("Shuru Tarikh",h("input",{className:"inp",type:"date",value:state.adminForm.admissionDate,onChange:e=>state.adminForm.admissionDate=e.target.value})));
+  let seatF=h("div",{className:"field"});
+  seatF.appendChild(h("label",{},"Seat Number *"));
+  let seatSel=h("select",{className:"inp",onChange:e=>{
+    let sn=e.target.value;let ts=timingsOf(sn);let firstAvail="";
+    if(ts.length>0){for(let t of ts){if(!isTaken(data.members,sn,t,state.editId)){firstAvail=t;break;}}}
+    state.adminForm={...state.adminForm,seatNumber:sn,timing:firstAvail};render();
+  }});
+  seatSel.appendChild(h("option",{value:""},"— Seat Chunao —"));
+  for(let i=1;i<=100;i++){
+    if(HIDDEN_SEATS.includes(i))continue; // Admin can't assign hidden seats
+    let cat=catOf(i);if(!cat)continue;
+    let opt=h("option",{value:String(i)},"#"+i+" | "+(labelOf(i,"")||"Reserved")+(cat==="4hr"?" ₹400":cat==="6hr"?" ₹400–600":" ₹900"));
+    if(String(i)===state.adminForm.seatNumber)opt.selected=true;
+    seatSel.appendChild(opt);
+  }
+  seatF.appendChild(seatSel);r3.appendChild(seatF);modal.appendChild(r3);
+  if(state.adminForm.seatNumber&&catOf(state.adminForm.seatNumber)!=="res"){
+    let tf=h("div",{className:"field"});
+    tf.appendChild(h("label",{},"Timing *"));
+    timingsOf(state.adminForm.seatNumber).forEach(t=>{
+      let taken=isTaken(data.members,state.adminForm.seatNumber,t,state.editId);
+      let isSelected=state.adminForm.timing===t;
+      let row=h("div",{className:"timing-row"+(isSelected?" t-selected":taken?" t-taken":""),onClick:()=>{if(!taken){state.adminForm.timing=t;render()}}});
+      row.appendChild(h("span",{className:"t-label"},t));
+      let rr=h("div",{style:{display:"flex",gap:"8px",alignItems:"center"}});
+      rr.appendChild(h("span",{className:"t-price"},"₹"+feeOf(state.adminForm.seatNumber,t)));
+      rr.appendChild(h("span",{className:"t-status "+(taken?"t-taken-lbl":"t-avail")},taken?"Booked":"Available"));
+      row.appendChild(rr);tf.appendChild(row);
+    });
+    modal.appendChild(tf);
+  }
+  let acts=h("div",{className:"modal-acts"});
+  acts.appendChild(h("button",{className:"btn btn-primary",style:{flex:"1"},onClick:()=>saveAdminMember()},"💾 Save Karo"));
+  acts.appendChild(h("button",{className:"btn btn-ghost",onClick:()=>setState({showForm:false})},"Cancel"));
+  modal.appendChild(acts);
+  overlay.appendChild(modal);
+  overlay.addEventListener("click",e=>{if(e.target===overlay)setState({showForm:false})});
+  return overlay;
+}
+
+function saveAdminMember(){
+  let ni=document.querySelector('[data-persist="a-name"]');if(ni)state.adminFormText.name=ni.value;
+  let f={...state.adminFormText,...state.adminForm};
+  if(!f.name.trim()){showToast("Naam zaroori hai!","err");return}
+  if(!f.phone.trim()){showToast("Phone zaroori hai!","err");return}
+  if(!f.seatNumber){showToast("Seat chunao!","err");return}
+  if(HIDDEN_SEATS.includes(+f.seatNumber)){showToast("Yeh seat available nahi hai!","err");return}
+  if(catOf(f.seatNumber)!=="res"&&!f.timing){showToast("Timing chunao!","err");return}
+  if(isTaken(data.members,f.seatNumber,f.timing,state.editId)){showToast("Yeh slot occupied hai!","err");return}
+  let fee=feeOf(f.seatNumber,f.timing);
+  let renewalDate=addMonth(f.admissionDate);
+  if(state.editId){
+    data.members=data.members.map(m=>m.id===state.editId?{...m,name:f.name,fatherName:f.fatherName,phone:f.phone,aadhaar:f.cnic,address:f.address,seatNumber:f.seatNumber,timing:f.timing,admissionDate:f.admissionDate,fee,seatType:labelOf(f.seatNumber,f.timing),renewalDate}:m);
+    showToast("Member update ho gaya ✓");
+  } else {
+    data.members.push({id:Date.now(),name:f.name,fatherName:f.fatherName,phone:f.phone,aadhaar:f.cnic,address:f.address,seatNumber:f.seatNumber,timing:f.timing,admissionDate:f.admissionDate,fee,seatType:labelOf(f.seatNumber,f.timing),renewalDate,paymentMethod:"cash",renewalHistory:[]});
+    showToast("Member add ho gaya ✓");
+  }
+  saveData(data);setState({showForm:false});
+}
+
+// ══════════════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════════════
+function buildRenewModal(){
+  let m=state.confirmRenew;
+  let overlay=h("div",{className:"overlay"});
+  let modal=h("div",{className:"modal",style:{maxWidth:"380px",textAlign:"center"}});
+  modal.appendChild(h("div",{className:"drag"}));
+  modal.appendChild(h("div",{style:{fontSize:"44px",marginBottom:"10px"}},"🔄"));
+  modal.appendChild(h("div",{style:{fontSize:"17px",fontWeight:"800",marginBottom:"6px"}},"Renewal Confirm?"));
+  modal.appendChild(h("div",{style:{fontWeight:"700",fontSize:"15px"}},m.name+" — #"+m.seatNumber));
+  if(m.timing)modal.appendChild(h("div",{style:{color:"#c4b5fd",fontSize:"13px",marginTop:"3px"}},"⏰ "+m.timing));
+  let info=h("div",{style:{background:"var(--bg2)",borderRadius:"var(--r2)",padding:"13px",margin:"13px 0",fontSize:"13px",border:"1px solid var(--border)"}});
+  info.appendChild(h("div",{style:{color:"var(--muted2)"}},"Purani date: "+fmtDate(m.renewalDate)));
+  info.appendChild(h("div",{style:{color:"var(--green3)",fontWeight:"800",marginTop:"5px",fontSize:"14px"}},"Nayi date: "+fmtDate(addMonth(m.renewalDate))));
+  info.appendChild(h("div",{style:{color:"var(--cyan)",fontWeight:"700",marginTop:"3px"}},"Fee: ₹"+m.fee));
+  modal.appendChild(info);
+  let acts=h("div",{className:"modal-acts"});
+  acts.appendChild(h("button",{className:"btn btn-green",style:{flex:"1"},onClick:()=>{
+    data.members=data.members.map(mem=>mem.id!==m.id?mem:{...mem,renewalDate:addMonth(mem.renewalDate),renewalHistory:[...(mem.renewalHistory||[]),{expired:mem.renewalDate,renewedOn:todayStr(),amount:mem.fee}]});
+    saveData(data);showToast("Renewal ho gayi! ✓");setState({confirmRenew:null});
+  }},"✅ Renew — ₹"+m.fee));
+  acts.appendChild(h("button",{className:"btn btn-ghost",onClick:()=>setState({confirmRenew:null})},"Cancel"));
+  modal.appendChild(acts);
+  overlay.appendChild(modal);
+  overlay.addEventListener("click",e=>{if(e.target===overlay)setState({confirmRenew:null})});
+  return overlay;
+}
+
+function buildDeleteModal(){
+  let m=state.confirmDelete;
+  let overlay=h("div",{className:"overlay"});
+  let modal=h("div",{className:"modal",style:{maxWidth:"380px",textAlign:"center"}});
+  modal.appendChild(h("div",{className:"drag"}));
+  modal.appendChild(h("div",{style:{fontSize:"44px",marginBottom:"10px"}},"🗑️"));
+  modal.appendChild(h("div",{style:{fontSize:"17px",fontWeight:"800",marginBottom:"6px",color:"var(--red)"}},"Delete Confirm?"));
+  modal.appendChild(h("div",{style:{fontWeight:"700",fontSize:"15px"}},m.name+" — #"+m.seatNumber));
+  modal.appendChild(h("div",{style:{color:"var(--muted2)",fontSize:"13px",marginTop:"10px"}},"Delete ke baad yeh seat khali ho jayegi. Yeh undo nahi hoga."));
+  let acts=h("div",{className:"modal-acts",style:{marginTop:"16px"}});
+  acts.appendChild(h("button",{className:"btn",style:{flex:"1",background:"#dc2626",color:"#fff"},onClick:()=>{
+    data.members=data.members.filter(mem=>mem.id!==m.id);
+    saveData(data);showToast("Member delete ho gaya","err");setState({confirmDelete:null});
+  }},"🗑️ Delete Karo"));
+  acts.appendChild(h("button",{className:"btn btn-ghost",onClick:()=>setState({confirmDelete:null})},"Cancel"));
+  modal.appendChild(acts);
+  overlay.appendChild(modal);
+  overlay.addEventListener("click",e=>{if(e.target===overlay)setState({confirmDelete:null})});
+  return overlay;
+}
+
+function buildBackupModal(){
+  let overlay=h("div",{className:"overlay"});
+  let modal=h("div",{className:"modal",style:{maxWidth:"380px",textAlign:"center"}});
+  modal.appendChild(h("div",{className:"drag"}));
+  modal.appendChild(h("div",{style:{fontSize:"32px",marginBottom:"6px"}},"💾"));
+  modal.appendChild(h("div",{style:{fontSize:"16px",fontWeight:"800",marginBottom:"14px"}},"Data Backup & Export"));
+  function bigBtn(emoji,label,color,bg,onClick){
+    let b=h("button",{onClick,style:{width:"100%",background:bg,color,border:"2px solid "+color+"44",borderRadius:"10px",padding:"12px",fontWeight:"700",fontSize:"13px",cursor:"pointer",marginBottom:"8px",fontFamily:"'Plus Jakarta Sans',sans-serif",textAlign:"left",display:"flex",alignItems:"center",gap:"10px"}});
+    b.appendChild(h("span",{style:{fontSize:"18px"}},emoji));b.appendChild(h("span",{},label));return b;
+  }
+  modal.appendChild(bigBtn("📥","Backup (.json)","#60a5fa","rgba(96,165,250,.1)",()=>{
+    let blob=new Blob([JSON.stringify({version:"smartlib_v3",savedOn:new Date().toLocaleString("en-IN"),members:data.members.map(m=>{let c={...m};delete c.passportPhoto;delete c.aadhaarPhoto;return c})},null,2)],{type:"application/json"});
+    let url=URL.createObjectURL(blob);let a=document.createElement("a");a.href=url;a.download="library-backup-"+todayStr()+".json";a.click();URL.revokeObjectURL(url);showToast("Backup download! ✓");
+  }));
+  modal.appendChild(bigBtn("📤","Restore Backup","#4ade80","rgba(74,222,128,.1)",()=>{
+    let inp=document.createElement("input");inp.type="file";inp.accept=".json";
+    inp.onchange=e=>{let file=e.target.files[0];if(!file)return;let r=new FileReader();r.onload=ev=>{try{let d=JSON.parse(ev.target.result);let ms=d.members||d;if(!Array.isArray(ms))throw 0;data={members:ms};saveData(data);setState({showBackup:false});showToast("Data restore! ("+ms.length+" members)")}catch{showToast("Galat file!","err")}};r.readAsText(file)};
+    inp.click();
+  }));
+  modal.appendChild(bigBtn("📊","CSV Export","#34d399","rgba(52,211,153,.1)",()=>{
+    let rows=[["Seat","Naam","Father","Phone","Aadhaar","Address","Type","Timing","Fee","Start","Renewal","Status"]];
+    enriched().forEach(m=>rows.push([m.seatNumber,m.name,m.fatherName||"",m.phone,m.aadhaar||"",m.address||"",m.seatType||"",m.timing||"",m.fee,m.admissionDate,m.renewalDate,m.daysLeft>=0?m.daysLeft+"d left":Math.abs(m.daysLeft)+"d expired"]));
+    let csv=rows.map(r=>r.map(c=>'"'+(c||"").toString().replace(/"/g,'""')+'"').join(",")).join("\n");
+    let blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});let url=URL.createObjectURL(blob);let a=document.createElement("a");a.href=url;a.download="library-members-"+todayStr()+".csv";a.click();URL.revokeObjectURL(url);showToast("CSV export! ✓");
+  }));
+  modal.appendChild(h("button",{onClick:()=>setState({showBackup:false}),style:{width:"100%",background:"var(--bg4)",color:"var(--muted2)",border:"none",borderRadius:"9px",padding:"11px",fontWeight:"600",cursor:"pointer",fontFamily:"'Plus Jakarta Sans',sans-serif",marginTop:"4px"}},"Bund Karo"));
+  overlay.appendChild(modal);
+  overlay.addEventListener("click",e=>{if(e.target===overlay)setState({showBackup:false})});
+  return overlay;
+}
+
+function buildAdminLoginModal(){
+  let overlay=h("div",{className:"overlay"});
+  let modal=h("div",{className:"modal",style:{maxWidth:"340px"}});
+  modal.appendChild(h("div",{className:"drag"}));
+  modal.appendChild(h("div",{style:{fontSize:"30px",textAlign:"center",marginBottom:"8px"}},"🔐"));
+  modal.appendChild(h("div",{className:"modal-head",style:{justifyContent:"center"}},"Admin Login"));
+  let f=h("div",{className:"field"});
+  f.appendChild(h("label",{},"Admin Password"));
+  f.appendChild(h("input",{className:"inp",type:"password",placeholder:"Password daalo",value:state.adminPassInput,dataset:{persist:"admin-pass"},onInput:e=>state.adminPassInput=e.target.value,onKeydown:e=>{if(e.key==="Enter")tryAdminLogin()}}));
+  modal.appendChild(f);
+  modal.appendChild(h("div",{style:{fontSize:"11px",color:"var(--muted2)",marginBottom:"12px"}},'💡 Default password: "admin123"'));
+  let acts=h("div",{className:"modal-acts"});
+  acts.appendChild(h("button",{className:"btn btn-amber",style:{flex:"1"},onClick:()=>tryAdminLogin()},"Login →"));
+  acts.appendChild(h("button",{className:"btn btn-ghost",onClick:()=>setState({showAdminLogin:false,adminPassInput:""})},"Cancel"));
+  modal.appendChild(acts);
+  overlay.appendChild(modal);
+  overlay.addEventListener("click",e=>{if(e.target===overlay)setState({showAdminLogin:false,adminPassInput:""})});
+  return overlay;
+}
+
+function tryAdminLogin(){
+  let inp=document.querySelector('[data-persist="admin-pass"]');
+  let pass=inp?inp.value:state.adminPassInput;
+  if(pass===ADMIN_PASS){setState({isAdmin:true,showAdminLogin:false,adminPassInput:"",screen:"admin"});showToast("Admin login! 🎉")}
+  else showToast("Galat password!","err");
+}
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){
+    if(state.showForm)setState({showForm:false});
+    else if(state.confirmRenew)setState({confirmRenew:null});
+    else if(state.confirmDelete)setState({confirmDelete:null});
+    else if(state.showBackup)setState({showBackup:false});
+    else if(state.showAdminLogin)setState({showAdminLogin:false,adminPassInput:""});
+  }
+});
+
+// ══════════════════════════════════════════════
+// STARTUP — JSONBin se online data load karo
+// ══════════════════════════════════════════════
+(async function startup(){
+  // Loading overlay dikhao
+  let loader=document.createElement("div");
+  loader.id="sl-load";
+  loader.innerHTML='<div style="position:fixed;inset:0;background:#050c1a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:14px">'
+    +'<div style="font-size:48px">📚</div>'
+    +'<div style="color:#e8f0ff;font-size:20px;font-weight:800;font-family:sans-serif">SmartLib</div>'
+    +'<div style="color:#4a6589;font-size:12px;font-family:sans-serif" id="sl-load-txt">Online data load ho raha hai...</div>'
+    +'<style>.sl-sp{width:38px;height:38px;border:3px solid #1a2e4a;border-top:3px solid #3b82f6;border-radius:50%;animation:slr .7s linear infinite}@keyframes slr{to{transform:rotate(360deg)}}</style>'
+    +'<div class="sl-sp"></div></div>';
+  document.body.appendChild(loader);
+
+  function rmLoader(){let l=document.getElementById("sl-load");if(l){l.style.transition="opacity .3s";l.style.opacity="0";setTimeout(()=>l.remove(),320);}}
+  function setTxt(t){let el=document.getElementById("sl-load-txt");if(el)el.textContent=t;}
+
+  // Pehle check karo ki JSONBin configured hai ya nahi
+  if(JBIN_BIN==="JSONBIN_BIN_ID_HERE"){
+    // Pehli baar — nayi bin create karo
+    setTxt("Pehli baar setup ho raha hai...");
+    try{
+      let r=await fetch("https://api.jsonbin.io/v3/b",{
+        method:"POST",
+        headers:{"Content-Type":"application/json","X-Master-Key":JBIN_KEY,"X-Bin-Name":"SmartLib-Data","X-Collection-Id":"","X-Private":"false"},
+        body:JSON.stringify({members:[]})
+      });
+      if(r.ok){
+        let j=await r.json();
+        let binId=j.metadata.id;
+        // Bin ID script mein hi replace karo (self-patching!)
+        // Aur localStorage mein save karo
+        localStorage.setItem("sl_bin",binId);
+        // Global variable update karo
+        window._jbinId=binId;
+        Object.defineProperty(window,"JBIN_BIN",{get:function(){return localStorage.getItem("sl_bin")||"JSONBIN_BIN_ID_HERE";}});
+        setTxt("Setup complete! Shuru ho raha hai...");
+      }
+    }catch(e){setTxt("Offline mode mein chal raha hai");}
+  } else {
+    // Bin ID already set hai, ya localStorage mein hai
+    let stored=localStorage.getItem("sl_bin");
+    if(stored)Object.defineProperty(window,"JBIN_BIN",{get:function(){return stored;},configurable:true});
+  }
+
+  // Online se data load karo
+  let binId=localStorage.getItem("sl_bin");
+  if(binId&&binId!=="JSONBIN_BIN_ID_HERE"){
+    setTxt("Members data aa raha hai...");
+    let online=await jbinGet();
+    if(online&&online.members){
+      online=mergePhotos(online);
+      data=online;
+      try{localStorage.setItem(SK,JSON.stringify(data));}catch(e){}
+    }
+  }
+
+  rmLoader();
+  render();
+})();
+</script>
+</body>
+</html>
